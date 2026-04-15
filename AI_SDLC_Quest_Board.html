@@ -1,0 +1,2405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AI SDLC Quest Board</title>
+<style>
+/* ── Dark theme (default) ── */
+:root {
+  --bg: #0F0F1A;
+  --surface: #1A1A2E;
+  --surface2: #222240;
+  --border: #2E2E52;
+  --text: #E8E8F5;
+  --text-muted: #8888AA;
+  --primary: #7B6FF0;
+  --primary-glow: rgba(123,111,240,0.25);
+  --easy: #43A047; --easy-bg: #1B2E1C; --easy-border: #2E5230;
+  --medium: #F9A825; --medium-bg: #2E2410; --medium-border: #5C4820;
+  --hard: #E65100; --hard-bg: #2E1A0D; --hard-border: #5C3210;
+  --xp: #FFD700;
+  --level2: #1976D2; --level3: #E65100;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --example-code-bg: #0F0F1A;
+  --example-code-color: #A5D6A7;
+  --example-tpl-color: #B3E5FC;
+}
+
+/* ── Light theme ── */
+html[data-theme="light"] {
+  --bg: #F4F5FB;
+  --surface: #FFFFFF;
+  --surface2: #EDEEF8;
+  --border: #D8DAF0;
+  --text: #1A1A2E;
+  --text-muted: #5C5C80;
+  --primary: #5B4FCF;
+  --primary-glow: rgba(91,79,207,0.12);
+  --easy: #2E7D32; --easy-bg: #F1F8F1; --easy-border: #C8E6C9;
+  --medium: #E65100; --medium-bg: #FFF8F0; --medium-border: #FFCC80;
+  --hard: #C62828; --hard-bg: #FFF0F0; --hard-border: #FFCDD2;
+  --xp: #9A7D0A;
+  --level2: #1565C0; --level3: #BF360C;
+  --example-code-bg: #EDEEF8;
+  --example-code-color: #2E7D32;
+  --example-tpl-color: #1565C0;
+}
+
+/* ── Auto-detect system preference ── */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F4F5FB;
+    --surface: #FFFFFF;
+    --surface2: #EDEEF8;
+    --border: #D8DAF0;
+    --text: #1A1A2E;
+    --text-muted: #5C5C80;
+    --primary: #5B4FCF;
+    --primary-glow: rgba(91,79,207,0.12);
+    --easy: #2E7D32; --easy-bg: #F1F8F1; --easy-border: #C8E6C9;
+    --medium: #E65100; --medium-bg: #FFF8F0; --medium-border: #FFCC80;
+    --hard: #C62828; --hard-bg: #FFF0F0; --hard-border: #FFCDD2;
+    --xp: #9A7D0A;
+    --level2: #1565C0; --level3: #BF360C;
+    --example-code-bg: #EDEEF8;
+    --example-code-color: #2E7D32;
+    --example-tpl-color: #1565C0;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── Header ── */
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.app-logo{font-size:18px;font-weight:800;letter-spacing:-0.5px;color:var(--text);}
+.app-logo span{color:var(--primary);}
+.header-right{display:flex;align-items:center;gap:16px;}
+.level-badge{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;}
+.level-badge .lv{font-weight:800;color:var(--primary);font-size:15px;}
+.xp-wrap{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);}
+.xp-bar-outer{width:120px;height:6px;background:var(--border);border-radius:4px;overflow:hidden;}
+.xp-bar-fill{height:100%;background:var(--xp);border-radius:4px;transition:width 0.6s ease;}
+.xp-num{color:var(--xp);font-weight:700;}
+.btn-settings{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);padding:5px 12px;font-size:12px;cursor:pointer;transition:border-color .2s,color .2s;}
+.btn-settings:hover{border-color:var(--primary);color:var(--primary);}
+.btn-theme{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);padding:5px 10px;font-size:15px;cursor:pointer;line-height:1;transition:border-color .2s;}
+.btn-theme:hover{border-color:var(--primary);}
+
+/* ── Main layout ── */
+.main{max-width:960px;margin:0 auto;padding:32px 24px 80px;}
+#panel-roadmap{max-width:100%;padding:0;}
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);margin-bottom:16px;}
+
+/* ── Active quests ── */
+.active-quests{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:40px;}
+
+/* ── Quest card ── */
+.quest-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.quest-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.quest-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.quest-card.easy::before{background:var(--easy);}
+.quest-card.medium::before{background:var(--medium);}
+.quest-card.hard::before{background:var(--hard);}
+
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.diff-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;border-radius:5px;padding:3px 9px;text-transform:uppercase;letter-spacing:0.5px;}
+.diff-badge.easy{background:var(--easy-bg);color:var(--easy);border:1px solid var(--easy-border);}
+.diff-badge.medium{background:var(--medium-bg);color:var(--medium);border:1px solid var(--medium-border);}
+.diff-badge.hard{background:var(--hard-bg);color:var(--hard);border:1px solid var(--hard-border);}
+.chain-tag{font-size:11px;color:var(--text-muted);background:var(--surface2);border-radius:4px;padding:2px 7px;white-space:nowrap;}
+.xp-tag{font-size:11px;color:var(--xp);font-weight:700;white-space:nowrap;}
+
+.quest-title{font-size:16px;font-weight:700;color:var(--text);line-height:1.3;}
+.quest-desc{font-size:13px;color:var(--text-muted);line-height:1.65;}
+
+/* ── Example toggle ── */
+.example-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--primary);cursor:pointer;user-select:none;border:none;background:transparent;padding:0;font-family:inherit;}
+.example-toggle:hover{opacity:.8;}
+.example-box{display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:12.5px;color:var(--text-muted);line-height:1.7;white-space:pre-wrap;}
+.example-box.open{display:block;}
+.example-box strong{color:var(--text);}
+.example-box code{background:var(--example-code-bg);border-radius:4px;padding:2px 6px;font-family:monospace;font-size:12px;color:var(--example-code-color);}
+.example-box .tpl{background:var(--example-code-bg);border-radius:6px;padding:10px;margin-top:8px;font-family:monospace;font-size:12px;color:var(--example-tpl-color);line-height:1.6;white-space:pre;}
+
+/* ── Complete button ── */
+.btn-complete{background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:auto;transition:background .2s,transform .1s;}
+.btn-complete:hover{background:#6358D0;transform:translateY(-1px);}
+.btn-complete:active{transform:translateY(0);}
+
+/* ── Completion flash ── */
+@keyframes flash{0%{opacity:1}50%{opacity:.3}100%{opacity:1}}
+.quest-card.completing{animation:flash .4s ease;}
+
+/* ── Upcoming ── */
+.upcoming-list{display:flex;flex-direction:column;gap:8px;margin-bottom:40px;}
+.upcoming-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px;opacity:.6;}
+.upcoming-item .lock-icon{font-size:16px;flex-shrink:0;}
+.upcoming-title{font-size:13px;font-weight:600;color:var(--text-muted);}
+.upcoming-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+
+/* ── Completed ── */
+.completed-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);cursor:pointer;user-select:none;border:none;background:transparent;color:var(--text-muted);font-family:inherit;padding:0;margin-bottom:12px;}
+.completed-toggle:hover{color:var(--text);}
+.completed-list{display:none;flex-direction:column;gap:8px;}
+.completed-list.open{display:flex;}
+.completed-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;gap:12px;opacity:.5;}
+.completed-item .check{color:var(--easy);font-size:16px;}
+.completed-item-title{font-size:13px;font-weight:600;text-decoration:line-through;}
+.completed-xp{font-size:11px;color:var(--xp);margin-left:auto;white-space:nowrap;}
+
+/* ── Level gate banner ── */
+.level-gate{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;margin-bottom:24px;}
+.level-gate h3{font-size:18px;font-weight:700;color:var(--primary);margin-bottom:8px;}
+.level-gate p{font-size:14px;color:var(--text-muted);max-width:500px;margin:0 auto 16px;}
+.btn-upgrade{background:linear-gradient(135deg,#1565C0,#1976D2);color:white;border:none;border-radius:var(--radius-sm);padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-upgrade:hover{opacity:.9;}
+
+/* ── Setup wizard ── */
+#setup-screen{display:none;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;background:var(--bg);}
+#setup-screen.hidden{display:none;}
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:600px;width:100%;}
+.setup-card h1{font-size:24px;font-weight:800;margin-bottom:8px;}
+.setup-card p{font-size:14px;color:var(--text-muted);margin-bottom:28px;line-height:1.6;}
+.setup-step{display:none;}
+.setup-step.active{display:block;}
+.setup-step h2{font-size:18px;font-weight:700;margin-bottom:16px;}
+.level-options{display:flex;gap:12px;margin-bottom:24px;}
+.level-opt{flex:1;background:var(--surface2);border:2px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
+.level-opt:hover{border-color:var(--primary);}
+.level-opt.selected{border-color:var(--primary);background:rgba(123,111,240,.15);}
+.level-opt .lv-num{font-size:28px;font-weight:800;color:var(--primary);}
+.level-opt .lv-name{font-size:12px;color:var(--text-muted);margin-top:4px;}
+.checklist{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;max-height:300px;overflow-y:auto;}
+.check-item{display:flex;align-items:flex-start;gap:10px;background:var(--surface2);border-radius:var(--radius-sm);padding:12px;cursor:pointer;transition:background .15s;}
+.check-item:hover{background:rgba(123,111,240,.1);}
+.check-item input{width:16px;height:16px;accent-color:var(--primary);flex-shrink:0;margin-top:1px;cursor:pointer;}
+.check-item label{font-size:13px;line-height:1.5;cursor:pointer;}
+.btn-next{background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);padding:12px 32px;font-size:15px;font-weight:700;cursor:pointer;width:100%;}
+.btn-next:hover{background:#6358D0;}
+.setup-note{font-size:12px;color:var(--text-muted);text-align:center;margin-top:12px;}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:48px 24px;color:var(--text-muted);}
+.empty-state .icon{font-size:48px;margin-bottom:16px;}
+.empty-state h3{font-size:18px;color:var(--text);margin-bottom:8px;}
+
+/* ── Tabs ── */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);padding:0 24px;}
+.tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:14px;font-weight:600;padding:14px 20px;cursor:pointer;font-family:inherit;margin-bottom:-1px;transition:color .2s,border-color .2s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── Assessment dashboard ── */
+.assess-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.assess-level{display:flex;align-items:center;gap:12px;}
+.assess-lv-num{width:48px;height:48px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0;}
+.assess-lv-label{font-size:18px;font-weight:700;}
+.assess-lv-sub{font-size:13px;color:var(--text-muted);margin-top:2px;}
+.assess-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.assess-save-btn{font-size:13px;font-weight:600;border-radius:8px;padding:8px 18px;background:var(--primary);color:white;border:none;cursor:pointer;transition:opacity .2s;}
+.assess-save-btn:hover{opacity:.85;}
+.assess-save-btn:disabled{opacity:.4;cursor:default;}
+
+/* Question cards in assessment tab */
+.aq-wrap{display:flex;flex-direction:column;gap:12px;padding-bottom:40px;}
+.aq-section-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:8px 0 4px;border-bottom:1px solid var(--border);margin-top:4px;}
+.aq-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.aq-card.answered{border-left:3px solid var(--easy);}
+.aq-hdr{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.aq-num{width:24px;height:24px;border-radius:50%;background:var(--surface2);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.aq-num.done{background:var(--easy);color:white;}
+.aq-title{font-size:14px;font-weight:600;line-height:1.4;flex:1;}
+.aq-badge{font-size:10px;font-weight:700;border-radius:4px;padding:2px 7px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;flex-shrink:0;margin-left:6px;vertical-align:middle;}
+.aq-badge.core{background:#FBE9E7;color:#BF360C;}
+.aq-badge.core3{background:#FFF8E1;color:#9A7D0A;}
+.aq-badge.scoring{background:var(--surface2);color:var(--text-muted);}
+.aq-badge.context{background:var(--surface2);color:var(--text-muted);opacity:.7;}
+
+/* Compact radio/checkbox pills */
+.aq-opts{display:flex;flex-direction:column;gap:6px;}
+.aq-opts.pills{flex-direction:row;flex-wrap:wrap;gap:6px;}
+.aq-opt{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;font-size:13px;line-height:1.4;transition:border-color .15s,background .15s;user-select:none;}
+.aq-opt:hover{border-color:var(--primary);background:var(--surface2);}
+.aq-opt.selected{border-color:var(--primary);background:var(--surface2);}
+.aq-opt-icon{flex-shrink:0;font-size:14px;margin-top:1px;color:var(--text-muted);line-height:1;}
+.aq-opt.selected .aq-opt-icon{color:var(--primary);}
+.aq-opt.pill{padding:6px 12px;align-items:center;border-radius:20px;}
+.aq-opt.pill.selected{background:var(--primary);color:white;border-color:var(--primary);}
+.aq-tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;}
+.aq-score-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;margin-top:8px;}
+.aq-score-l1{background:var(--surface2);color:var(--text-muted);}
+.aq-score-l2{background:#E3F0FF;color:#1565C0;}
+.aq-score-l3{background:#E8F5E9;color:#2E7D32;}
+.aq-score-partial{background:var(--medium-bg);color:var(--medium);}
+
+/* Assessment hero score bar */
+.assess-score-bar{display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden;margin-top:8px;width:160px;}
+.assess-score-seg{flex:1;background:var(--border);}
+.assess-score-seg.lit-l2{background:#1976D2;}
+.assess-score-seg.lit-l3{background:var(--xp);}
+.assess-score-seg.lit-partial{background:var(--medium);}
+.assess-badge{font-size:10px;font-weight:700;border-radius:4px;padding:2px 7px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;flex-shrink:0;}
+.badge-core2{background:#FBE9E7;color:#BF360C;}
+.badge-core3{background:#FFF8E1;color:#9A7D0A;}
+.badge-scoring{background:var(--surface2);color:var(--text-muted);}
+.badge-context{background:var(--surface2);color:var(--text-muted);opacity:.6;}
+
+/* ── Roadmap tab — linear timeline ── */
+.roadmap-wrap{padding:28px 32px 60px;max-width:720px;margin:0 auto;}
+.roadmap-header{margin-bottom:28px;}
+.roadmap-header h2{font-size:20px;font-weight:700;margin-bottom:4px;}
+.roadmap-header p{font-size:13px;color:var(--text-muted);line-height:1.6;}
+
+/* Progress bar at top */
+.rm-progress-bar{height:6px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:12px;}
+.rm-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),var(--easy));transition:width .5s ease;}
+.rm-progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-top:5px;}
+
+/* Phase divider */
+.rm-phase{display:flex;align-items:center;gap:10px;margin:28px 0 14px;}
+.rm-phase-icon{font-size:16px;}
+.rm-phase-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);}
+.rm-phase-line{flex:1;height:1px;background:var(--border);}
+
+/* Gate banner */
+.rm-gate{display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin:24px 0;position:relative;overflow:hidden;}
+.rm-gate::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+.rm-gate.gate-l2::before{background:#1976D2;}
+.rm-gate.gate-l3::before{background:var(--xp);}
+.rm-gate.gate-l2{border-color:#90CAF9;}
+.rm-gate.gate-l3{border-color:var(--xp);}
+.rm-gate-icon{font-size:22px;flex-shrink:0;}
+.rm-gate-text{}
+.rm-gate-title{font-size:14px;font-weight:700;}
+.rm-gate-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.rm-gate.gate-l2 .rm-gate-title{color:#1565C0;}
+.rm-gate.gate-l3 .rm-gate-title{color:#E65100;}
+.rm-gate-check{margin-left:auto;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.rm-gate-check.met{background:#E8F5E9;color:#2E7D32;}
+.rm-gate-check.unmet{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);}
+
+/* Timeline step */
+.rm-step{display:flex;gap:16px;margin-bottom:4px;position:relative;}
+/* Vertical connecting line */
+.rm-step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:32px;}
+.rm-step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;border:2px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all .2s;z-index:1;}
+.rm-step-circle.done{background:var(--easy);border-color:var(--easy);color:white;}
+.rm-step-circle.active{background:var(--primary);border-color:var(--primary);color:white;}
+.rm-step-circle.pending{background:var(--surface);border-color:var(--border);color:var(--text-muted);}
+.rm-step-line{width:2px;flex:1;background:var(--border);min-height:12px;}
+.rm-step-line.done{background:var(--easy);}
+
+.rm-step-body{flex:1;padding-bottom:16px;}
+.rm-step-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.rm-step-q{font-size:10px;font-weight:700;color:var(--text-muted);background:var(--surface2);border-radius:4px;padding:2px 6px;letter-spacing:.3px;flex-shrink:0;}
+.rm-step-title{font-size:14px;font-weight:700;line-height:1.3;}
+.rm-step-title.done{color:var(--easy);}
+.rm-step-title.active{color:var(--primary);}
+.rm-step-title.pending{color:var(--text-muted);}
+.rm-step-hint{font-size:12px;color:var(--text-muted);line-height:1.5;margin-top:2px;}
+.rm-step-answer{font-size:12px;font-weight:600;margin-top:6px;padding:5px 10px;border-radius:6px;display:inline-block;}
+.rm-step-answer.done{background:#E8F5E9;color:#2E7D32;}
+.rm-step-answer.active{background:#E3F0FF;color:#1565C0;}
+.rm-step-answer.pending{background:var(--surface2);color:var(--text-muted);}
+.rm-step-core{font-size:10px;font-weight:700;color:#BF360C;background:#FBE9E7;border-radius:4px;padding:2px 6px;margin-left:4px;}
+
+/* ── Scores-toward tag on quest card ── */
+.scores-tag{font-size:11px;color:var(--text-muted);background:var(--surface2);border-radius:4px;padding:2px 7px;margin-top:-4px;}
+.scores-tag span{color:var(--primary);font-weight:600;}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--surface);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <h1>⚔️ AI SDLC Quest Board</h1>
+    <p>Your personalized improvement journey. Up to 3 active quests at a time — easy, medium, and hard — each unlocking the next. Let's calibrate your starting point.</p>
+
+    <div class="setup-step active" id="step-1">
+      <h2>What's your current AI Maturity Level?</h2>
+      <div class="level-options">
+        <div class="level-opt" onclick="selectLevel(1,this)">
+          <div class="lv-num">1</div>
+          <div class="lv-name">Exploring</div>
+        </div>
+        <div class="level-opt" onclick="selectLevel(2,this)">
+          <div class="lv-num">2</div>
+          <div class="lv-name">AI-Enabled</div>
+        </div>
+        <div class="level-opt" onclick="selectLevel(3,this)">
+          <div class="lv-num">3</div>
+          <div class="lv-name">AI-Native</div>
+        </div>
+      </div>
+      <button class="btn-next" onclick="goToStep2()">Next →</button>
+      <div class="setup-note">Not sure? Use the <a href="AI_SDLC_Maturity_Questionnaire.html" style="color:var(--primary)">Maturity Questionnaire</a> first.</div>
+    </div>
+
+    <div class="setup-step" id="step-2">
+      <h2>Which of these have you already completed?</h2>
+      <div class="checklist" id="setup-checklist"></div>
+      <button class="btn-next" onclick="completeSetup()">Start My Quest Board →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-screen" style="display:none;">
+  <div class="app-header">
+    <div class="app-logo">AI SDLC <span>Quest Board</span></div>
+    <div class="header-right">
+      <div class="xp-wrap">
+        <span id="hdr-xp-label"></span>
+        <div class="xp-bar-outer"><div class="xp-bar-fill" id="hdr-xp-bar"></div></div>
+        <span class="xp-num" id="hdr-xp-num"></span>
+      </div>
+      <div class="level-badge">Level <span class="lv" id="hdr-level">1</span></div>
+      <button class="btn-theme" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
+      <button class="btn-settings" onclick="openSettings()">⚙ Reset</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-quests"    onclick="switchTab('quests')">⚔️ Quests</button>
+    <button class="tab-btn"        id="tab-assessment" onclick="switchTab('assessment')">📊 Assessment</button>
+    <button class="tab-btn"        id="tab-roadmap"    onclick="switchTab('roadmap')">🗺️ Roadmap</button>
+  </div>
+
+  <div class="main">
+    <div class="tab-panel active" id="panel-quests">
+      <div id="main-content"></div>
+    </div>
+    <div class="tab-panel" id="panel-assessment">
+      <div id="assess-content"></div>
+    </div>
+    <div class="tab-panel" id="panel-roadmap">
+      <div id="roadmap-content"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// QUEST DATA — Edit this section to add, remove, or modify quests.
+// This block can be extracted to a standalone quests.json file if needed.
+//
+// Schema per quest:
+//   id        : unique string key
+//   chain     : logical grouping (e.g. 'champion', 'dau')
+//   tier      : 1 = Level 1→2, 2 = Level 2→3
+//   difficulty: 'easy' | 'medium' | 'hard'
+//   xp        : experience points awarded on completion
+//   title     : short quest name (shown on card)
+//   desc      : 2–3 sentence description of the quest
+//   requires  : [ ids ] — all must be completed first (empty = always available)
+//   example   : concrete template, artifact snippet, or directional guide
+// ═══════════════════════════════════════════════════════════════════════════════
+const QUEST_DATA = [
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // TIER 1 — Level 1 → Level 2
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // ── Chain: GenAI Approval ─────────────────────────────────────
+  {
+    id: 'approval_check',
+    chain: 'Approval', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Find out your GenAI approval status',
+    desc: 'Message your delivery manager or account manager and ask. They either know immediately, or can find out in one conversation. You don\'t need to read the contract yourself.',
+    requires: [],
+    example: `The one message to send right now:
+
+Slack/Teams your delivery manager or account manager:
+
+  "Hey — quick question. Do we have formal GenAI tool usage
+   approval in our contract with [Client]? I'm tracking our
+   AI Maturity and need to know if we're approved, restricted,
+   or if it's not addressed yet."
+
+That's it. They'll come back with one of:
+  ✅ "Yes, it's in the SoW — here's the clause"
+  ✅ "Yes, we have written approval from the client"
+  ⚠️  "It's approved but with restrictions — [list]"
+  ❌ "Not in the contract, we haven't addressed it"
+  ❌ "Client prohibits it"
+
+If they're not sure either → they'll forward to the right person.
+
+✅ Done when: You have a clear answer on approval status.`
+  },
+  {
+    id: 'approval_get',
+    chain: 'Approval', tier: 1, difficulty: 'medium', xp: 200,
+    title: 'Obtain formal GenAI approval',
+    desc: 'Work with your delivery manager and account team to get GenAI usage approved in writing. Even an email from the client confirming approval is valid as a starting point.',
+    requires: ['approval_check'],
+    example: `Email template to request GenAI approval:
+
+Subject: Request for approval — Generative AI tool usage on [Project Name]
+
+Hi [Client Contact],
+
+As part of our continuous improvement efforts on [Project Name], we would
+like to formalise our use of Generative AI tools to assist the engineering
+and delivery team. These tools help with tasks such as code generation,
+test case creation, and documentation drafting.
+
+We would like to request approval to use the following tools:
+• [Tool 1] — used for [purpose]
+• [Tool 2] — used for [purpose]
+
+All AI-generated output is reviewed by team members before use.
+Could you confirm approval, or let us know if there are any restrictions?
+
+Thank you,
+[Your name]
+
+✅ Done when: Written approval (email or contract addendum) is received.`
+  },
+
+  // ── Chain: AI Champion ────────────────────────────────────────
+  {
+    id: 'champ_nominate',
+    chain: 'Champion', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Nominate your AI Champion',
+    desc: 'Pick one person who is already curious about AI and give them the role. This is a decision, not a project — it can happen in your next standup. No special skills required yet.',
+    requires: [],
+    example: `What to tell them:
+
+"Hey [Name], I'd like you to be our AI Champion on this project.
+That means you're our go-to person for AI tools, you run occasional
+team sessions, and you maintain our shared prompt library.
+I'll share the AI Champion Playbook with you — it has a full guide."
+
+Typical Champion profile:
+• Curious about AI (doesn't need to be an expert)
+• Communicates well with the team
+• Has some capacity to run 1–2 sessions per month
+
+✅ Done when: One person has accepted the AI Champion role.`
+  },
+  {
+    id: 'champ_first_session',
+    chain: 'Champion', tier: 1, difficulty: 'medium', xp: 200,
+    title: 'Run your first AI showcase session',
+    desc: 'Your Champion runs a 30–45 minute hands-on session for the team using real tasks from your current sprint. This is the single highest-leverage action for DAU — people who see AI save time in a live demo are far more likely to use it the next day.',
+    requires: ['champ_nominate'],
+    example: `Suggested session agenda (30 min):
+
+0:00 – 0:05  Why we're doing this (1 slide max)
+0:05 – 0:15  Live demo: AI doing a task the team actually does
+             (e.g. writing a PR description, a test case, a user story)
+0:15 – 0:25  Team tries it: everyone picks one task and tries with AI
+0:25 – 0:30  Share what worked, what didn't, what to try next
+
+Tips:
+• Use a real backlog item or bug ticket as the demo input
+• Let the AI output be imperfect — that's a good teaching moment
+• End with "here's the shared prompt page" link
+
+✅ Done when: Session happened and at least 3 team members tried AI.`
+  },
+  {
+    id: 'champ_regular',
+    chain: 'Champion', tier: 1, difficulty: 'medium', xp: 175,
+    title: 'Schedule recurring AI team sessions',
+    desc: 'One-off sessions fade fast. Put a recurring 30-min session on the calendar — every two weeks works well. This keeps adoption momentum and gives the team a space to share what\'s working.',
+    requires: ['champ_first_session'],
+    example: `Calendar invite template:
+
+Title: AI Tooling Session — [Team Name]
+Cadence: Bi-weekly, 30 minutes
+Agenda (rotating):
+  Week A: One person shares a prompt or workflow that saved them time
+  Week B: Champion demos a new technique or tool feature
+  Occasional: Review AI-assisted output quality together
+
+✅ Done when: Recurring calendar event exists and the first follow-up session has run.`
+  },
+
+  // ── Chain: Tools ──────────────────────────────────────────────
+  {
+    id: 'tools_try',
+    chain: 'Tools', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Use AI for one real task this week',
+    desc: 'Don\'t plan, just try. Take any real task from your current workload and attempt it with an AI tool. Doesn\'t matter if the output is perfect — the goal is a first experience.',
+    requires: [],
+    example: `Good first tasks to try:
+• Writing a PR description from a git diff
+• Drafting acceptance criteria for a user story
+• Generating a first-pass test case list for a feature
+• Summarising a long requirements document
+• Writing a client-facing status update
+
+Tools you can try for free right now:
+• Claude.ai (claude.ai) — general tasks, docs, analysis
+• GitHub Copilot (free trial) — code generation
+• EPAM EliteA — if available on your project
+
+✅ Done when: You've used AI for one real work task and can describe the result.`
+  },
+  {
+    id: 'tools_team',
+    chain: 'Tools', tier: 1, difficulty: 'medium', xp: 225,
+    title: 'Roll out AI tool licenses to the whole team',
+    desc: 'Coordinate with procurement/IT to get the selected AI tool(s) accessible for all core team members. Partial rollout limits DAU growth — everyone needs access to measure usage accurately.',
+    requires: ['tools_try'],
+    example: `Rollout checklist:
+□ Confirm which tool(s) to standardise on (recommend 1–2 max)
+□ Get budget approval (EPAM tools: contact tooling team; client tools: raise with PM)
+□ Create a list of everyone who needs access (core roles only is fine to start)
+□ Set up accounts / licenses and confirm each person can log in
+□ Send a 2-line welcome message: "Here's your access. Try it for [this task]."
+
+Common blockers and fixes:
+• "Client won't allow cloud AI" → Try EPAM DIAL (on-prem option)
+• "No budget" → Use free tiers while approval is in progress
+• "IT restrictions" → Loop in account manager early
+
+✅ Done when: Every core team member has working access to at least one AI tool.`
+  },
+
+  // ── Chain: DAU ────────────────────────────────────────────────
+  {
+    id: 'dau_poll',
+    chain: 'DAU', tier: 1, difficulty: 'easy', xp: 50,
+    title: 'Send your first DAU check-in',
+    desc: 'Send a simple daily-or-weekly usage check in Slack or Teams. You don\'t need telemetry to start measuring. A single message gets you a baseline within a week.',
+    requires: [],
+    example: `Slack message template:
+
+👋 Quick AI usage check-in (takes 3 seconds):
+Did you use any AI tool at least once today?
+✅ Yes   ❌ No
+
+[Pin this message and repost it every Friday for 2 weeks]
+
+If using a survey tool (e.g. Google Forms, Microsoft Forms):
+Q: Did you use an AI tool at least once in the past 24 hours?
+   □ Yes  □ No  □ I don't have access yet
+
+✅ Done when: First check-in sent and at least 5 responses received.`
+  },
+  {
+    id: 'dau_baseline',
+    chain: 'DAU', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Establish a 2-week DAU baseline',
+    desc: 'Run your check-in for two weeks and record the results in a simple table. This is your "before" number — you\'ll need it to show improvement and to fill in the maturity survey accurately.',
+    requires: ['dau_poll'],
+    example: `Simple baseline tracker (copy to a spreadsheet):
+
+Week | Responses | Said Yes | DAU %
+W1   | 8 of 10   | 4        | 40%
+W2   | 9 of 10   | 5        | 50%
+Avg  |           |          | 45%
+
+Notes: [anything that affected the numbers that week]
+
+If using telemetry (GitHub Copilot Analytics, Azure Monitor):
+→ Screenshot the "Active users" or "Engaged users" chart
+→ Note the denominator (total team size)
+
+✅ Done when: 2 weeks of data recorded with a calculated average DAU %.`
+  },
+  {
+    id: 'dau_grow',
+    chain: 'DAU', tier: 1, difficulty: 'hard', xp: 450,
+    title: 'Grow DAU to 50%+ across the team',
+    desc: 'Getting half the team using AI every day requires understanding and removing blockers for each non-user. This takes Champion-led outreach, targeted prompts, and a few weeks of sustained effort.',
+    requires: ['dau_baseline'],
+    example: `DAU Growth Playbook:
+
+Step 1 — Identify non-users
+Ask anyone who said "No" to your check-in why.
+Common answers:
+  • "I forgot" → Create a habit anchor (e.g. "use AI before closing any ticket")
+  • "I don't know what to use it for" → Share role-specific prompt guide
+  • "My tasks don't feel AI-able" → Book a 20-min 1:1 with the Champion
+  • "I don't have access" → Fix access issue (see Tools quest)
+
+Step 2 — Targeted interventions
+For each blocker type, run a targeted fix this sprint.
+
+Step 3 — Track weekly
+Keep running your check-in. Celebrate the first week you hit 50%.
+
+✅ Done when: 2 consecutive weeks of 50%+ DAU recorded.`
+  },
+
+  // ── Chain: AI Artifacts ───────────────────────────────────────
+  {
+    id: 'artifact_first',
+    chain: 'Artifacts', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Write and share your first team prompt',
+    desc: 'Write one high-quality prompt for the most common task on your project. Share it in Slack or Teams. The goal is to show the team that a good prompt is simple, reusable, and saves real time.',
+    requires: [],
+    example: `Example prompt for writing user stories:
+
+"You are a business analyst on a software project.
+Write [N] user stories for the following feature:
+[paste feature description]
+
+For each story, use this format:
+As a [type of user], I want [goal] so that [benefit].
+
+Acceptance criteria:
+• [criterion 1]
+• [criterion 2]
+• [criterion 3]
+
+The target users are: [describe users]
+The tech stack is: [describe stack if relevant]"
+
+─────────────────────────────────────────────────────
+Example prompt for PR descriptions:
+
+"Given this git diff, write a clear pull request description.
+Include: summary (2 sentences), what changed and why,
+any notable decisions or trade-offs, testing approach.
+
+Git diff:
+[paste diff]"
+
+✅ Done when: Prompt shared with team and at least 2 people have used it.`
+  },
+  {
+    id: 'artifact_page',
+    chain: 'Artifacts', tier: 1, difficulty: 'easy', xp: 100,
+    title: 'Create a shared prompts page',
+    desc: 'Set up a Confluence page, SharePoint folder, or README in your repo as the single home for team AI prompts. Add your first 5 prompts. The structure matters more than the content at this stage.',
+    requires: ['artifact_first'],
+    example: `Recommended Confluence page structure:
+
+# 🤖 Team AI Prompts & Resources
+Last updated: [date] by [Champion name]
+
+## Quick Start
+→ [Link to 3-minute onboarding guide]
+→ Tools we use: [list]
+
+## Prompts by Role
+### 👩‍💻 Developers
+- [PR Description prompt]
+- [Code Review prompt]
+- [Unit Test generation prompt]
+
+### 🧪 QA Engineers
+- [Test case generation prompt]
+- [Bug report draft prompt]
+
+### 📋 Business Analysts / PMs
+- [User story writing prompt]
+- [Meeting summary prompt]
+- [Status update prompt]
+
+## Tips & Best Practices
+[Short notes on what works well]
+
+## Add Your Own
+If you have a prompt that saved you time, add it here!
+
+✅ Done when: Page/folder created with at least 5 prompts, link shared with team.`
+  },
+  {
+    id: 'artifact_library',
+    chain: 'Artifacts', tier: 1, difficulty: 'medium', xp: 250,
+    title: 'Grow the library to 15+ role-specific prompts',
+    desc: 'Expand your shared prompts page to cover the top 3–5 AI-applicable tasks for each core role. Each role should be able to open the page and immediately find something useful for their daily work.',
+    requires: ['artifact_page'],
+    example: `Coverage checklist (aim for 15+ prompts total):
+
+✅ Developer prompts (5):
+  □ Code review checklist
+  □ Unit test generation
+  □ PR description
+  □ Bug diagnosis / root cause analysis
+  □ Refactoring suggestions
+
+✅ QA prompts (3):
+  □ Test case generation from user story
+  □ Regression test list from change description
+  □ Bug report from observed behaviour
+
+✅ BA / PM prompts (4):
+  □ User story from feature description
+  □ Acceptance criteria refinement
+  □ Requirements gap analysis
+  □ Sprint retrospective summary
+
+✅ General (3):
+  □ Meeting notes to action items
+  □ Status update to stakeholders
+  □ Technical doc summarisation
+
+✅ Done when: 15+ prompts published, each role has at least 3 prompts covering their most frequent tasks.`
+  },
+
+  // ── Chain: Performance Metrics ────────────────────────────────
+  {
+    id: 'metrics_first',
+    chain: 'Metrics', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Pull your first cycle time report',
+    desc: 'Cycle time is almost certainly already tracked in your project management tool. Pull it now. This takes 5 minutes and gives you the baseline you need to demonstrate AI impact later.',
+    requires: [],
+    example: `How to pull cycle time in common tools:
+
+Jira:
+→ Reports → Control Chart (shows average cycle time per sprint)
+→ Or: Board → Insights → Cycle Time
+
+Azure DevOps:
+→ Analytics → Cycle Time (built-in widget)
+→ Or: Dashboard → Add Widget → "Cycle Time"
+
+GitHub Projects:
+→ Insights → Cycle time (available in GitHub Projects v2)
+
+What to record:
+• Average cycle time per issue type (story, bug, task)
+• Date of report (this is your pre-AI baseline)
+• Screenshot saved for evidence
+
+✅ Done when: Cycle time report pulled, screenshot saved, average noted.`
+  },
+  {
+    id: 'metrics_baseline',
+    chain: 'Metrics', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Document your pre-AI performance baseline',
+    desc: 'Save your current metrics before AI adoption changes them. Without a baseline, you can\'t demonstrate improvement. A simple table with today\'s numbers is all you need.',
+    requires: ['metrics_first'],
+    example: `Baseline record template (paste into Confluence/SharePoint):
+
+# AI Maturity — Performance Baseline
+Date captured: [today's date]
+Team size: [N] people
+
+Metric               | Value     | Source
+---------------------|-----------|--------
+Avg cycle time       | X days    | Jira/ADO
+Velocity             | X pts/spr | Jira
+Defect containment % | X%        | [tool]
+Bugs per release     | X         | [tool]
+
+Notes: [any context that affects these numbers]
+Next review: [date 3 months from now]
+
+✅ Done when: Table created and saved. Link shared with PM.`
+  },
+  {
+    id: 'metrics_throughput',
+    chain: 'Metrics', tier: 1, difficulty: 'medium', xp: 175,
+    title: 'Add throughput and quality tracking',
+    desc: 'Layer in throughput (velocity or tasks delivered) and a quality metric (defect containment rate is usually easiest). Together with cycle time, this gives you full productivity coverage for the maturity assessment.',
+    requires: ['metrics_baseline'],
+    example: `Throughput — easiest options:
+• Jira: "Velocity" report (stories/points completed per sprint)
+• ADO: "Throughput" in Analytics (work items closed per week)
+• Manual: Count closed tickets per sprint from board view
+
+Quality — easiest options:
+• Defect containment rate: (bugs found in QA ÷ bugs found in production) × 100
+  → Get QA bug count from test execution; prod bug count from support/monitoring
+• Bugs per release: count of production bugs per deployment
+• If no formal QA: track "bug tickets raised after release" per sprint
+
+Tip: You don't need a perfect dashboard. A fortnightly manual update to a spreadsheet is enough to satisfy the Maturity assessment requirements.
+
+✅ Done when: All three metric types (cycle time, throughput, quality) are being tracked and updated at least monthly.`
+  },
+
+  // ── Chain: AI-Assisted Deliverables (Core Criterion) ─────────
+  {
+    id: 'del_audit',
+    chain: 'Deliverables', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Audit one role\'s deliverables for AI potential',
+    desc: 'Pick one core role and list their 5 most frequent deliverables. For each, note whether it could be meaningfully assisted by AI. This takes 20 minutes and focuses your adoption effort.',
+    requires: [],
+    example: `Example audit — QA Engineer:
+
+Deliverable              | AI-assistable? | How?
+-------------------------|----------------|------
+Test cases from stories  | ✅ Yes, high    | Generate first-pass test cases
+Bug reports              | ✅ Yes, medium  | Draft structured bug reports
+Regression test suite    | ✅ Yes, medium  | Generate regression scenarios
+Test execution reports   | ✅ Yes, low     | Summarise results in prose
+Performance test scripts | ⚠️ Partially   | Suggest scenarios, not full scripts
+
+Example audit — Developer:
+
+Deliverable              | AI-assistable? | How?
+-------------------------|----------------|------
+Feature code             | ✅ Yes, high    | Boilerplate, function stubs
+Unit tests               | ✅ Yes, high    | Generate from function signatures
+Code reviews             | ✅ Yes, medium  | First-pass checklist
+PR descriptions          | ✅ Yes, high    | Generate from diff
+Documentation            | ✅ Yes, high    | Draft from code/comments
+
+✅ Done when: Audit complete for at least one core role, results saved.`
+  },
+  {
+    id: 'del_tag',
+    chain: 'Deliverables', tier: 1, difficulty: 'easy', xp: 50,
+    title: 'Create an "AI-assisted" label in Jira / ADO',
+    desc: 'Add a label or tag to track which work items were created or significantly assisted by AI. This is how you measure your deliverable % accurately and evidence it for the maturity assessment.',
+    requires: ['del_audit'],
+    example: `Jira setup:
+→ Project Settings → Issue Types → Labels
+→ Add label: "ai-assisted"
+→ Tell the team: "Add this label to any story, bug, or task where AI helped you significantly"
+
+Azure DevOps setup:
+→ Work Items → Tags → add tag "ai-assisted"
+→ Or use a custom field if you prefer more detail
+
+Tip: Don't overthink the threshold. A good rule of thumb:
+"Did AI save me more than 20% of the time to complete this work item?"
+If yes → tag it.
+
+Monthly review: Filter by label and count tagged vs total.
+% = (tagged items ÷ total items) × 100
+
+✅ Done when: Label/tag created, team briefed, first tagged item exists.`
+  },
+  {
+    id: 'del_workflow',
+    chain: 'Deliverables', tier: 1, difficulty: 'medium', xp: 225,
+    title: 'Build an AI workflow for one deliverable type',
+    desc: 'Turn your audit findings into a repeatable process: a prompt + a 3-step guide for how to use AI to produce one specific type of deliverable. Share it on the prompts page.',
+    requires: ['del_tag'],
+    example: `Example workflow — "AI-assisted test case generation":
+
+Step 1: Prepare input
+  Copy the user story into Claude/Copilot with this prompt:
+  "Generate test cases for this user story using Given/When/Then format.
+  Include happy path, edge cases, and error scenarios.
+  User story: [paste story]"
+
+Step 2: Review & refine
+  Review the generated cases. Add any domain-specific cases the AI missed.
+  Typical: AI covers ~70–80% of cases; you add the last 20%.
+
+Step 3: Tag and track
+  Add the "ai-assisted" label to the story in Jira.
+
+Time saved: ~40–60% on test case writing for standard CRUD features.
+Works best for: Well-written user stories with clear acceptance criteria.
+Doesn't work well for: Complex business logic with many dependencies.
+
+✅ Done when: Workflow documented, at least 3 team members have used it.`
+  },
+  {
+    id: 'del_50',
+    chain: 'Deliverables', tier: 1, difficulty: 'hard', xp: 500,
+    title: '🎯 Get AI-assisted deliverables to 50%+ — Level 2 Core',
+    desc: 'The core criterion for Level 2. This requires AI to be meaningfully embedded across all core roles. Track your Jira label, run role-specific sessions, and push until the majority of work items are AI-tagged.',
+    requires: ['del_workflow'],
+    example: `Push plan (run over 4–6 weeks):
+
+Week 1–2: Fix the stragglers
+  → Pull your AI-assisted label report
+  → Identify which roles have < 25% tagging
+  → Book 20-min 1:1s with one person from each lagging role
+  → Walk through one real task together using AI
+
+Week 3–4: Expand workflows
+  → Build AI workflows for the top deliverable type in each lagging role
+  → Add them to the shared prompts page
+  → Champion mentions them in standup
+
+Week 5–6: Maintain momentum
+  → Weekly check-in on label percentage
+  → Celebrate first sprint where a role hits 50%
+
+Tracking report (monthly):
+Role       | AI-tagged | Total items | %
+-----------|-----------| ------------|----
+Developer  | 12        | 18          | 67%
+QA         | 8         | 20          | 40% ← focus here
+BA/PM      | 6         | 8           | 75%
+Overall    | 26        | 46          | 57% ✅
+
+✅ Done when: 50%+ AI-assisted across all core roles for 2 consecutive sprints.`
+  },
+
+  // ── Chain: Cost Visibility ────────────────────────────────────
+  {
+    id: 'cost_list',
+    chain: 'Cost', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Create an AI cost inventory',
+    desc: 'List every AI tool license and inference cost the project is paying. Even a simple spreadsheet makes AI spend visible, which is the first step toward justifying and optimising it.',
+    requires: [],
+    example: `AI Cost Inventory template:
+
+Tool            | Tier/Plan     | Cost/month | # Seats | Who manages | Notes
+----------------|---------------|------------|---------|-------------|------
+GitHub Copilot  | Business      | $19/seat   | 8       | IT          |
+Claude.ai       | Pro           | $20/seat   | 4       | EPAM        | Delivery team
+EPAM EliteA     | Included      | $0         | All     | EPAM        |
+[Client tool]   | Enterprise    | $X (est.)  | ?       | Client IT   | No visibility
+
+Total visible AI spend: $[X]/month
+Notes: [anything that affects costs — trial periods, etc.]
+
+✅ Done when: Inventory created, reviewed with PM, saved to project wiki.`
+  },
+  {
+    id: 'cost_share',
+    chain: 'Cost', tier: 1, difficulty: 'easy', xp: 75,
+    title: 'Share AI cost overview with project leadership',
+    desc: 'Make AI spend visible to your PM and account manager. It takes 5 minutes but shifts AI tools from "hidden costs" to "tracked investment" — a meaningful step for governance.',
+    requires: ['cost_list'],
+    example: `Brief email to PM:
+
+Subject: AI tooling costs — [Project Name]
+
+Hi [PM name],
+
+Here's a quick overview of current AI tool spend on [Project Name]:
+[paste cost table]
+
+Visible monthly AI cost: $[X]
+Tools with no visibility (client-managed): [list]
+
+Happy to discuss at our next sync. I can also track this monthly if useful.
+
+[Your name]
+
+✅ Done when: Cost inventory shared with PM and acknowledged.`
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // TIER 2 — Level 2 → Level 3
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // ── Chain: Full Champion Coverage ────────────────────────────
+  {
+    id: 'champ2_identify',
+    chain: 'Champion+', tier: 2, difficulty: 'easy', xp: 100,
+    title: 'Identify champion candidates for all core roles',
+    desc: 'For each core role that doesn\'t yet have an AI Champion, identify one candidate who is already AI-enthusiastic. List them with their role and current AI usage level.',
+    requires: [],
+    example: `Champion coverage map:
+
+Role             | Current Champion | Candidate for new Champion | AI enthusiasm (1-5)
+-----------------|------------------|----------------------------|---------------------
+Developer        | ✅ Alex M.        | —                          | —
+QA               | ❌ None           | Jordan P.                  | 4/5
+BA               | ❌ None           | Sam K.                     | 3/5
+DevOps           | ❌ None           | Riley T.                   | 4/5
+
+Next step: Book a 30-min intro call with each candidate.
+
+✅ Done when: A named candidate identified for every role without a champion.`
+  },
+  {
+    id: 'champ2_train',
+    chain: 'Champion+', tier: 2, difficulty: 'medium', xp: 275,
+    title: 'Train and onboard role-specific champions',
+    desc: 'Your existing champion mentors the new candidates. Each new champion should run at least one session for their role and take ownership of role-specific prompts.',
+    requires: ['champ2_identify'],
+    example: `New Champion onboarding checklist (per person):
+
+Week 1:
+□ Share AI Champion Playbook
+□ Pair session with existing champion (shadow a team session)
+□ Review existing prompts for their role
+□ Identify 2–3 gaps in the prompt library
+
+Week 2:
+□ Champion runs a 20-min show-and-tell for their role peers
+□ Adds at least 2 new prompts to the shared library
+□ Sets up their own DAU tracking for their role
+
+Ongoing:
+□ Monthly sync with all champions to share what's working
+□ Owns the prompts for their role
+□ Reports role DAU to the PM
+
+✅ Done when: All new champions have run at least one session and added prompts.`
+  },
+  {
+    id: 'champ2_all',
+    chain: 'Champion+', tier: 2, difficulty: 'hard', xp: 500,
+    title: 'AI Champions active across all core roles',
+    desc: 'All core roles have a named, active champion who runs sessions, maintains role-specific prompts, and tracks AI usage for their role. Verify by reviewing activity over the past month.',
+    requires: ['champ2_train'],
+    example: `Champion activity review (run monthly):
+
+Champion  | Role       | Sessions run | Prompts added | Role DAU
+----------|------------|--------------|---------------|--------
+Alex M.   | Developer  | 2            | 3             | 78%
+Jordan P. | QA         | 1            | 2             | 65%
+Sam K.    | BA         | 2            | 4             | 71%
+Riley T.  | DevOps     | 1            | 1             | 60%
+
+All roles active? ✅ / ❌
+Minimum bar: 1 session run in past 4 weeks, 1+ prompt added, DAU tracked.
+
+✅ Done when: All core roles show activity in the past month.`
+  },
+
+  // ── Chain: DAU to 70% ─────────────────────────────────────────
+  {
+    id: 'dau2_who',
+    chain: 'DAU+', tier: 2, difficulty: 'easy', xp: 100,
+    title: 'Identify who isn\'t at daily AI usage',
+    desc: 'At Level 2 your DAU is already at 50%+. Getting to 70%+ means understanding the specific blockers for the remaining non-daily users. Run a targeted survey or 1:1 check-ins.',
+    requires: [],
+    example: `Quick survey (5 questions, send to whole team):
+
+1. Do you use an AI tool at least once every working day?
+   □ Yes, every day  □ Most days  □ A few times/week  □ Rarely/never
+
+2. If not every day, what's the main reason?
+   □ I forget  □ My tasks don't feel AI-able  □ Output quality is inconsistent
+   □ Access/speed issues  □ I'm not sure how to use it for my role  □ Other: ___
+
+3. Which of your daily tasks would you most like AI help with?
+   [free text]
+
+4. Do you have a role-specific prompt guide you can use?
+   □ Yes and it's helpful  □ Yes but I don't use it  □ No  □ Don't know
+
+5. What would help you use AI more consistently?
+   [free text]
+
+✅ Done when: Survey sent and responses from 80%+ of team received and analysed.`
+  },
+  {
+    id: 'dau2_target',
+    chain: 'DAU+', tier: 2, difficulty: 'medium', xp: 275,
+    title: 'Run targeted sessions for non-daily users',
+    desc: 'Based on your survey, run role-specific or blocker-specific interventions for the team members who aren\'t yet at daily usage. One-on-one sessions with the relevant champion work better than group sessions at this stage.',
+    requires: ['dau2_who'],
+    example: `Intervention playbook by blocker type:
+
+"I forget"
+→ Create a Slack reminder bot (Geekbot, or a simple scheduled message)
+→ Suggest a habit anchor: "use AI before marking any ticket In Review"
+
+"My tasks don't feel AI-able"
+→ Book a 20-min 1:1 with the champion for that role
+→ Work through their actual current tasks, find one AI use case together
+
+"Output quality is inconsistent"
+→ Share the role-specific prompt guide
+→ Show the "review before use" habit (AI draft → human review → done)
+
+"I'm not sure how to use it for my role"
+→ Run a role-specific hands-on session (30 min, real tasks)
+→ Leave them with 3 specific prompts to try that week
+
+✅ Done when: At least one targeted session run per blocker type identified.`
+  },
+  {
+    id: 'dau2_70',
+    chain: 'DAU+', tier: 2, difficulty: 'hard', xp: 475,
+    title: 'Achieve 70%+ DAU — Level 3 threshold',
+    desc: 'Sustain 70% or more of the team using AI at least once daily for two consecutive weeks. This typically requires all the pieces to be in place: tools, prompts, champions, and habit anchors.',
+    requires: ['dau2_target'],
+    example: `Final push checklist:
+□ All team members have access to at least one AI tool
+□ Every core role has a prompt guide with 5+ role-specific prompts
+□ Daily habit anchor in place (reminder, workflow step, or standup mention)
+□ Champions tracking and checking in with their role peers weekly
+
+Evidence to capture:
+• Screenshot of telemetry (GitHub Copilot Analytics, Azure Monitor)
+  showing "Active Users" ÷ "Total Users" ≥ 70% for 2 weeks
+• OR: Survey results showing 70%+ "Yes, every day" for 2 weeks
+
+✅ Done when: 2 consecutive weeks of 70%+ DAU, evidenced by telemetry or survey.`
+  },
+
+  // ── Chain: Novel Tools ────────────────────────────────────────
+  {
+    id: 'novel_research',
+    chain: 'Novel Tools', tier: 2, difficulty: 'easy', xp: 100,
+    title: 'Research one novel AI workflow for your project',
+    desc: 'Look at what "Novel AI tools" means in practice and identify one workflow in your project that could benefit from a novel approach — multi-agent orchestration, spec-driven development, or custom agents.',
+    requires: [],
+    example: `Novel tool categories to explore:
+
+Multi-agent orchestration:
+→ Multiple AI agents working together (e.g. planner + coder + reviewer)
+→ Tools: Claude Code with custom agents, Cursor with agentic mode
+→ Good for: Complex feature development with multiple sub-tasks
+
+Spec-driven development:
+→ AI writes a spec from requirements, then writes code from the spec
+→ Tools: Claude Code, GitHub Copilot Workspace
+→ Good for: Well-defined features where requirements are clear
+
+Custom agents:
+→ Project-specific AI agents trained on your codebase and process
+→ Tools: EPAM EliteA custom agents, CUAS plugin, Claude Code skills
+→ Good for: Repetitive project-specific tasks (e.g. "our way of writing tests")
+
+Automated scenario execution:
+→ AI generates and runs test scenarios automatically
+→ Tools: GitHub Copilot for tests + Playwright, custom scripts
+→ Good for: Regression testing, acceptance testing
+
+Research output (document this):
+1. Which novel approach fits your project best?
+2. Which role would benefit most?
+3. What's the simplest PoC you could run in 1 week?
+
+✅ Done when: One novel approach identified with a documented PoC plan.`
+  },
+  {
+    id: 'novel_poc',
+    chain: 'Novel Tools', tier: 2, difficulty: 'medium', xp: 300,
+    title: 'Build and demo a proof of concept',
+    desc: 'Build the smallest version of your chosen novel AI workflow and demo it to the team. It doesn\'t need to be production-ready — the goal is to show it\'s possible and valuable.',
+    requires: ['novel_research'],
+    example: `PoC framework (1 week):
+
+Day 1–2: Build
+  → Implement the simplest version of the workflow
+  → For agents: write the agent script/CLAUDE.md
+  → For spec-driven: try on one real story
+  → For automated tests: write one scenario generator
+
+Day 3: Validate
+  → Run it on 2–3 real examples from your backlog
+  → Note: time saved, quality of output, failure modes
+
+Day 4: Document
+  → Write a one-page summary: what it does, how to use it, what it can't do
+  → Store agent code / prompt files in the project repo
+
+Day 5: Demo
+  → 20-min team demo: show it live, explain the approach
+  → Collect feedback: would you use this? What's missing?
+
+Evidence to capture (required for Level 3 assessment):
+  → Screenshot of agent/script in source control
+  → Recording or notes from demo session
+
+✅ Done when: PoC built, demoed to team, code in source control.`
+  },
+  {
+    id: 'novel_prod',
+    chain: 'Novel Tools', tier: 2, difficulty: 'hard', xp: 500,
+    title: '🚀 Novel AI tool active in production workflow — Level 3 Core',
+    desc: 'The Level 3 core criterion. A novel AI approach is no longer a PoC — it\'s part of how the team actually works, used regularly, and evidenced in source control.',
+    requires: ['novel_poc'],
+    example: `Production readiness checklist:
+
+□ Agent/workflow code is in the project Git repository
+□ README or SKILL.md file explains how to use it
+□ At least 2 people on the team use it regularly (not just the creator)
+□ It's mentioned in onboarding for relevant roles
+□ You can show 5+ examples of it being used on real work items
+
+Source control evidence (screenshots required for L3 assessment):
+  → Repository structure showing agent/workflow files
+  → Commit history showing ongoing maintenance
+  → File names and descriptions clearly explain purpose
+
+Example repository structure:
+  /ai-agents
+    /code-reviewer/    ← custom code review agent
+    /test-generator/   ← automated test scenario generator
+    /story-refiner/    ← user story improvement workflow
+  /prompts             ← shared prompt library (existing)
+  CLAUDE.md            ← project-level AI instructions
+
+✅ Done when: Novel tool in active use, evidenced in source control, team can operate it independently.`
+  },
+
+  // ── Chain: Codified Artifacts ─────────────────────────────────
+  {
+    id: 'code_repo',
+    chain: 'Artifacts+', tier: 2, difficulty: 'easy', xp: 100,
+    title: 'Create a Git repository for AI artifacts',
+    desc: 'Move your AI artifacts — prompts, rules, agent configs — out of Confluence and into source control. This is the first step toward treating AI artifacts like code.',
+    requires: [],
+    example: `Setting up the AI artifacts repository:
+
+Option A: Subfolder in your existing project repo
+  /project-root
+    /ai                      ← new folder
+      /prompts               ← role-specific prompts
+      /agents                ← agent scripts
+      /rules                 ← .cursorrules, CLAUDE.md etc.
+      README.md              ← how to use these artifacts
+
+Option B: Standalone repo (if multiple projects will share them)
+  ai-artifacts/
+    /prompts
+    /agents
+    README.md
+
+Getting started in 30 minutes:
+  1. Create the folder/repo
+  2. Copy your top 5 prompts from Confluence into markdown files
+  3. Add a README with instructions
+  4. Commit and push
+  5. Share link in Slack — "prompts are now in source control"
+
+✅ Done when: Repository created with at least 5 prompts in markdown files.`
+  },
+  {
+    id: 'code_migrate',
+    chain: 'Artifacts+', tier: 2, difficulty: 'medium', xp: 250,
+    title: 'Migrate all prompts and rules to source control',
+    desc: 'Move everything from Confluence/SharePoint into the repository. Add a CLAUDE.md or .cursorrules file for project-level AI context. Deprecate the old pages (or link them to the repo).',
+    requires: ['code_repo'],
+    example: `CLAUDE.md template (project-level AI instructions):
+
+# Project AI Context — [Project Name]
+
+## Project Overview
+[2-3 sentences: what the project does, tech stack, key constraints]
+
+## Coding Conventions
+- Language/framework: [e.g. TypeScript + React, Java + Spring Boot]
+- Test framework: [e.g. Jest, JUnit]
+- Naming conventions: [e.g. camelCase for variables, PascalCase for components]
+- Architecture patterns: [e.g. clean architecture, MVC]
+
+## Key Domain Terms
+- [Term]: [definition]
+- [Term]: [definition]
+
+## What AI Should Always Do
+- Always write unit tests for new functions
+- Always add JSDoc comments to exported functions
+- Follow our PR template format (see /docs/pr-template.md)
+
+## What AI Should Never Do
+- Never hardcode credentials or secrets
+- Never use deprecated API: [list]
+
+## Useful References
+- API docs: [link]
+- Design system: [link]
+- Architecture decision records: [link]
+
+✅ Done when: All prompts in repo, CLAUDE.md committed, old Confluence pages updated to link to repo.`
+  },
+  {
+    id: 'code_ci',
+    chain: 'Artifacts+', tier: 2, difficulty: 'hard', xp: 475,
+    title: 'Set up automated artifact validation and distribution',
+    desc: 'Treat prompt and agent changes like code: PR reviews, a validation check, and an automated way to distribute updates to the team. This is the "continuous improvement loop" required for Level 3.',
+    requires: ['code_migrate'],
+    example: `CI/CD for AI artifacts:
+
+1. PR review process (simple):
+   → Any change to /ai/* requires review from the AI Champion
+   → Add CODEOWNERS file: /ai/ @ai-champion-username
+   → Review checklist: Does the prompt have an example? Is the output format clear?
+
+2. Validation script (very simple):
+   Create .github/workflows/validate-prompts.yml:
+   - Checks that every .md prompt file has: title, description, example, done-criteria
+   - Runs on every PR touching /ai/
+   - Fails the check if a file is missing required sections
+
+3. Distribution:
+   → On merge to main, post a message to #ai-tools Slack channel:
+      "New AI artifact: [name]. See: [link]"
+   → Or: GitHub Copilot / Claude Code picks up CLAUDE.md automatically
+   → Or: Run a monthly "what's new in AI artifacts" in your champion session
+
+✅ Done when: At least 2 PRs have gone through review process, one automated check is running.`
+  },
+
+  // ── Chain: Cost Optimisation ──────────────────────────────────
+  {
+    id: 'cost2_review',
+    chain: 'Cost+', tier: 2, difficulty: 'medium', xp: 250,
+    title: 'Run your first monthly AI cost review',
+    desc: 'Schedule a 30-min monthly review to look at AI spend vs. output. Compare license costs against measured productivity gains. Document findings — this evidence is required for Level 3.',
+    requires: [],
+    example: `Monthly AI Cost Review agenda (30 min):
+
+0:00 – 0:10  Review costs
+  → Total AI spend this month: $[X]
+  → Breakdown by tool: [table]
+  → Any cost changes from last month?
+
+0:10 – 0:20  Review value
+  → AI-assisted deliverables % this month: [X]%
+  → DAU trend: [up/down/stable]
+  → Any notable time savings the team reported?
+  → Rough ROI: If AI saved X hours at $Y/hour → $Z value vs $W cost
+
+0:20 – 0:30  Optimisation decisions
+  → Any tools underused? (usage < 20% of team) → consider removing
+  → Any tools at capacity? → consider expanding
+  → Any new tools worth trialling?
+  → Action items for next month
+
+Document and save: screenshots of dashboards + meeting notes → store in project wiki.
+
+✅ Done when: First review completed, notes saved, recurring calendar invite created.`
+  },
+  {
+    id: 'cost2_optimize',
+    chain: 'Cost+', tier: 2, difficulty: 'hard', xp: 450,
+    title: 'Implement proactive AI cost optimisation',
+    desc: 'Move from observation to action: track spend trends over 3+ months, make documented optimisation decisions, and demonstrate cost-output improvement. Required evidence for Level 3 assessment.',
+    requires: ['cost2_review'],
+    example: `Evidence package for Level 3 cost assessment:
+
+Document: AI Cost Optimisation — [Project Name]
+
+3-Month Trend:
+Month | AI Spend | AI-Assisted % | DAU | Cost/output ratio
+------|----------|---------------|-----|------------------
+Jan   | $420     | 52%           | 54% | $8.07/AI-assisted item
+Feb   | $380     | 61%           | 63% | $6.23/AI-assisted item ← improved
+Mar   | $390     | 68%           | 70% | $5.74/AI-assisted item ← improved
+
+Optimisation decisions made:
+Mar: Removed GitHub Copilot for 2 team members who preferred Claude Code
+    → Saved $38/month, no negative impact on their DAU
+Apr: Upgraded to team license for Claude → saved $40/month, added 3 users
+
+Next quarter target: Get cost/output ratio below $5.00
+
+Screenshots attached:
+  → GitHub Copilot Analytics (Feb–Mar)
+  → Monthly cost summary emails
+
+✅ Done when: 3 months of data, at least one documented optimisation decision with outcome measured.`
+  }
+
+];
+// ═══════════════════════════════════════════════════════════════════════════════
+// END QUEST DATA
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Maps each chain to the assessment criterion it contributes to (null = context only)
+const CHAIN_TO_CRITERION = {
+  'Approval':    null,
+  'Champion':    'AI Champions',
+  'Tools':       'AI Tools',
+  'DAU':         'Daily Active Usage',
+  'Artifacts':   'AI Artifacts',
+  'Metrics':     'Performance Metrics',
+  'Deliverables':'AI-Assisted Deliverables',
+  'Cost':        'AI Cost',
+  'Champion+':   'AI Champions',
+  'DAU+':        'Daily Active Usage',
+  'Novel Tools': 'Novel AI Tools',
+  'Artifacts+':  'AI Artifacts',
+  'Cost+':       'AI Cost',
+};
+
+// Chain priority for quest selection (lower = higher priority to show first)
+const CHAIN_PRIORITY = {
+  'Champion': 1, 'Tools': 2, 'Deliverables': 3, 'DAU': 4,
+  'Artifacts': 5, 'Metrics': 6, 'Cost': 7, 'Approval': 8,
+  'Champion+': 1, 'DAU+': 2, 'Novel Tools': 3, 'Artifacts+': 4, 'Cost+': 5
+};
+
+const XP_PER_LEVEL = 2000;
+const STATE_KEY = 'ai_maturity_quest_board_v1';
+
+// ── State management ─────────────────────────────────────────────────────────
+function loadState() {
+  try {
+    const s = localStorage.getItem(STATE_KEY);
+    return s ? JSON.parse(s) : null;
+  } catch(e) { return null; }
+}
+
+function saveState(state) {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function newState(level, completedIds) {
+  const xp = completedIds.reduce((sum, id) => {
+    const q = QUEST_DATA.find(q => q.id === id);
+    return sum + (q ? q.xp : 0);
+  }, 0);
+  return { level, completedIds: [...completedIds], xp, activeIds: [] };
+}
+
+// ── Quest selection algorithm ────────────────────────────────────────────────
+function getAvailableQuests(state) {
+  return QUEST_DATA.filter(q => {
+    if (state.completedIds.includes(q.id)) return false;
+    if (q.tier > state.level) return false;
+    if (q.requires && !q.requires.every(r => state.completedIds.includes(r))) return false;
+    return true;
+  });
+}
+
+function selectActiveQuests(state) {
+  const available = getAvailableQuests(state);
+  if (available.length === 0) return [];
+
+  const byDiff = { easy: [], medium: [], hard: [] };
+  available.forEach(q => {
+    const sorted = byDiff[q.difficulty];
+    // insert by chain priority
+    const idx = sorted.findIndex(s => (CHAIN_PRIORITY[s.chain] || 99) > (CHAIN_PRIORITY[q.chain] || 99));
+    if (idx === -1) sorted.push(q);
+    else sorted.splice(idx, 0, q);
+  });
+
+  const selected = [];
+  const usedChains = new Set();
+
+  for (const diff of ['easy', 'medium', 'hard']) {
+    const candidates = byDiff[diff];
+    const pick = candidates.find(q => !usedChains.has(q.chain)) || candidates[0];
+    if (pick && !selected.includes(pick)) {
+      selected.push(pick);
+      usedChains.add(pick.chain);
+    }
+  }
+
+  // fill up to 3 if needed
+  const remaining = available.filter(q => !selected.includes(q));
+  while (selected.length < 3 && remaining.length > 0) {
+    selected.push(remaining.shift());
+  }
+
+  return selected;
+}
+
+function getUpcomingQuests(state, activeIds) {
+  const available = getAvailableQuests(state).filter(q => !activeIds.includes(q.id));
+  return available.slice(0, 4);
+}
+
+// ── Setup wizard ─────────────────────────────────────────────────────────────
+let setupLevel = 1;
+
+function selectLevel(n, el) {
+  setupLevel = n;
+  document.querySelectorAll('.level-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function goToStep2() {
+  if (!document.querySelector('.level-opt.selected')) {
+    alert('Please select your current level first.');
+    return;
+  }
+  document.getElementById('step-1').classList.remove('active');
+  document.getElementById('step-2').classList.add('active');
+
+  // Show easy quests from tier 1 as "already done?" options
+  const candidates = QUEST_DATA.filter(q => q.tier === 1 && q.difficulty === 'easy' && q.requires.length === 0);
+  const cl = document.getElementById('setup-checklist');
+  cl.innerHTML = candidates.map(q => `
+    <div class="check-item">
+      <input type="checkbox" id="ck-${q.id}" value="${q.id}">
+      <label for="ck-${q.id}"><strong>${q.title}</strong><br><span style="color:var(--text-muted);font-size:12px;">${q.chain}</span></label>
+    </div>`).join('');
+
+  if (setupLevel >= 2) {
+    // Add tier 2 easy no-requires quests too
+    const t2 = QUEST_DATA.filter(q => q.tier === 2 && q.difficulty === 'easy' && q.requires.length === 0);
+    cl.innerHTML += t2.map(q => `
+      <div class="check-item">
+        <input type="checkbox" id="ck-${q.id}" value="${q.id}">
+        <label for="ck-${q.id}"><strong>${q.title}</strong><br><span style="color:var(--text-muted);font-size:12px;">${q.chain} · Tier 2</span></label>
+      </div>`).join('');
+  }
+}
+
+function completeSetup() {
+  const checked = [...document.querySelectorAll('#setup-checklist input:checked')].map(i => i.value);
+  const state = newState(setupLevel, checked);
+  state.activeIds = selectActiveQuests(state).map(q => q.id);
+  saveState(state);
+  showApp(state);
+}
+
+// ── Render app ───────────────────────────────────────────────────────────────
+function showApp(state) {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  renderHeader(state);
+  renderMain(state);
+  // Render whichever tab is currently active
+  const activeTab = document.querySelector('.tab-btn.active');
+  if (activeTab && activeTab.id === 'tab-assessment') {
+    renderAssessment(state);
+  } else if (activeTab && activeTab.id === 'tab-roadmap') {
+    renderRoadmap(state);
+  } else {
+    // Default: render assessment in background so it's ready when clicked
+    renderAssessment(state);
+  }
+}
+
+function renderHeader(state) {
+  document.getElementById('hdr-level').textContent = state.level;
+  const xpInLevel = state.xp % XP_PER_LEVEL;
+  const pct = Math.min(100, Math.round(xpInLevel / XP_PER_LEVEL * 100));
+  document.getElementById('hdr-xp-bar').style.width = pct + '%';
+  document.getElementById('hdr-xp-num').textContent = state.xp + ' XP';
+  document.getElementById('hdr-xp-label').textContent = `Level ${state.level} progress:`;
+}
+
+function renderMain(state) {
+  const activeQuests = state.activeIds.map(id => QUEST_DATA.find(q => q.id === id)).filter(Boolean);
+  const upcoming = getUpcomingQuests(state, state.activeIds);
+  const completed = state.completedIds.map(id => QUEST_DATA.find(q => q.id === id)).filter(Boolean);
+
+  const diffIcon = { easy: '🟢', medium: '🟡', hard: '🟠' };
+  const diffLabel = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
+
+  let html = '';
+
+  // ── Active quests
+  html += `<div class="section-title">⚔️ Active Quests</div>`;
+
+  if (activeQuests.length === 0) {
+    const allDone = getAvailableQuests(state).length === 0;
+    if (allDone && state.level >= 3) {
+      html += `<div class="empty-state"><div class="icon">🏆</div><h3>All quests complete!</h3><p>You've reached AI SDLC Level 3. Legendary.</p></div>`;
+    } else if (allDone) {
+      html += `<div class="level-gate">
+        <h3>🔓 Ready to advance to Level ${state.level + 1}?</h3>
+        <p>You've completed all available quests for Level ${state.level}. Update your level to unlock the next tier of quests.</p>
+        <button class="btn-upgrade" onclick="advanceLevel()">Advance to Level ${state.level + 1} →</button>
+      </div>`;
+    } else {
+      html += `<div class="empty-state"><div class="icon">🔍</div><h3>No quests selected yet</h3></div>`;
+    }
+  } else {
+    html += `<div class="active-quests">`;
+    activeQuests.forEach(q => {
+      html += `
+        <div class="quest-card ${q.difficulty}" id="card-${q.id}">
+          <div class="card-top">
+            <span class="diff-badge ${q.difficulty}">${diffIcon[q.difficulty]} ${diffLabel[q.difficulty]}</span>
+            <span class="chain-tag">${q.chain}</span>
+            <span class="xp-tag">+${q.xp} XP</span>
+          </div>
+          <div class="quest-title">${q.title}</div>
+          <div class="quest-desc">${q.desc}</div>
+          ${CHAIN_TO_CRITERION[q.chain] ? `<div class="scores-tag">📈 Scores toward: <span>${CHAIN_TO_CRITERION[q.chain]}</span></div>` : '<div class="scores-tag" style="color:var(--text-muted);opacity:.6;">📋 Context — informs your assessment</div>'}
+          <button class="example-toggle" onclick="toggleExample('ex-${q.id}', this)">▶ Show example &amp; guide</button>
+          <div class="example-box" id="ex-${q.id}">${formatExample(q.example)}</div>
+          <button class="btn-complete" onclick="completeQuest('${q.id}')">✓ Mark Complete</button>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── Level gate if on tier 2 quests and at level 1
+  if (state.level === 1) {
+    const tier2Count = QUEST_DATA.filter(q => q.tier === 2).length;
+    html += `<div style="margin-bottom:32px;">
+      <div class="section-title">🔒 Level 3 Quests — Locked</div>
+      <div class="upcoming-item" style="opacity:.35;cursor:default;">
+        <span class="lock-icon">🔒</span>
+        <div><div class="upcoming-title">${tier2Count} quests unlock at Level 2</div>
+        <div class="upcoming-meta">Complete your Level 2 core criterion (50%+ AI-assisted deliverables) to access these.</div></div>
+      </div>
+    </div>`;
+  }
+
+  // ── Upcoming
+  if (upcoming.length > 0) {
+    html += `<div class="section-title" style="margin-top:8px;">⏳ Coming Up Next</div>
+      <div class="upcoming-list">`;
+    upcoming.forEach(q => {
+      html += `<div class="upcoming-item">
+        <span class="lock-icon">${diffIcon[q.difficulty]}</span>
+        <div>
+          <div class="upcoming-title">${q.title}</div>
+          <div class="upcoming-meta">${q.chain} · ${diffLabel[q.difficulty]} · +${q.xp} XP</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── Completed
+  if (completed.length > 0) {
+    html += `<div style="margin-top:32px;">
+      <button class="completed-toggle" onclick="document.getElementById('completed-list').classList.toggle('open');this.textContent=this.textContent.startsWith('▶')?'▼ Completed quests (${completed.length})':'▶ Completed quests (${completed.length})'">
+        ▶ Completed quests (${completed.length})
+      </button>
+      <div class="completed-list" id="completed-list">`;
+    [...completed].reverse().forEach(q => {
+      html += `<div class="completed-item">
+        <span class="check">✦</span>
+        <div class="completed-item-title">${q.title}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-left:8px;">${q.chain}</div>
+        <div class="completed-xp">+${q.xp} XP</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  document.getElementById('main-content').innerHTML = html;
+}
+
+function formatExample(text) {
+  // Basic formatting: code blocks, bold
+  return text
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function toggleExample(id, btn) {
+  const box = document.getElementById(id);
+  const open = box.classList.toggle('open');
+  btn.textContent = (open ? '▼ Hide' : '▶ Show') + ' example & guide';
+}
+
+// ── Complete a quest ─────────────────────────────────────────────────────────
+function completeQuest(id) {
+  const state = loadState();
+  if (!state) return;
+
+  const quest = QUEST_DATA.find(q => q.id === id);
+  if (!quest) return;
+
+  // Flash animation
+  const card = document.getElementById('card-' + id);
+  if (card) { card.classList.add('completing'); setTimeout(() => card.classList.remove('completing'), 400); }
+
+  // Update state
+  state.completedIds.push(id);
+  state.xp += quest.xp;
+
+  // Check for level advance (if they completed the deliverables core quest)
+  if (id === 'del_50' && state.level === 1) {
+    setTimeout(() => {
+      if (confirm(`🎉 You've completed the Level 2 core criterion!\n\nDo you want to advance to Level 2 now and unlock Level 3 quests?`)) {
+        state.level = 2;
+        state.activeIds = selectActiveQuests(state).map(q => q.id);
+        saveState(state);
+        showApp(state);
+      }
+    }, 300);
+  } else if (id === 'novel_prod' && state.level === 2) {
+    setTimeout(() => {
+      if (confirm(`🏆 You've completed the Level 3 core criterion!\n\nDo you want to advance to Level 3?`)) {
+        state.level = 3;
+        state.activeIds = selectActiveQuests(state).map(q => q.id);
+        saveState(state);
+        showApp(state);
+        return;
+      }
+    }, 300);
+  }
+
+  // Select new active quests (fill the slot opened by completion)
+  state.activeIds = state.activeIds.filter(i => i !== id);
+  const newActive = selectActiveQuests(state).filter(q => !state.activeIds.includes(q.id));
+  if (newActive.length > 0) {
+    // Add one new quest to fill the slot
+    const newPick = newActive[0];
+    state.activeIds.push(newPick.id);
+  }
+
+  saveState(state);
+  renderHeader(state);
+  renderMain(state);
+}
+
+function advanceLevel() {
+  const state = loadState();
+  if (!state) return;
+  state.level = Math.min(3, state.level + 1);
+  state.activeIds = selectActiveQuests(state).map(q => q.id);
+  saveState(state);
+  showApp(state);
+}
+
+function openSettings() {
+  if (confirm('Reset your quest board and start over?\n\nThis will clear all progress.')) {
+    localStorage.removeItem(STATE_KEY);
+    location.reload();
+  }
+}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function switchTab(name) {
+  ['quests','assessment','roadmap'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === name);
+    document.getElementById('panel-' + t).classList.toggle('active', t === name);
+  });
+  if (name === 'assessment') {
+    const state = loadState();
+    if (state) renderAssessment(state);
+  }
+  if (name === 'roadmap') {
+    const state = loadState();
+    if (state) renderRoadmap(state);
+  }
+}
+
+// ── Assessment — exact questionnaire questions ─────────────────────────────────
+
+const ASSESSMENT_QUESTIONS = [
+  // ── Context questions ──
+  {
+    id: 'q1', num: 1, type: 'radio', badge: 'context', section: 'Context',
+    title: 'Does your project have formal approval for Generative AI usage in the MSA and SoW?',
+    scoreKey: null,
+    opts: [
+      { v: 'prohibited',       l: 'No — client explicitly prohibits GenAI usage in the MSA, SoWs.' },
+      { v: 'no_approval',      l: 'No — approvals for GenAI usage have not been obtained in the MSA, SoWs.' },
+      { v: 'written_approval', l: 'No, however we have written approval from the client for GenAI usage.' },
+      { v: 'restricted',       l: 'Yes, GenAI usage is approved in the MSA, SoW with restrictions.' },
+      { v: 'widely',           l: 'Yes, AI usage is approved in the MSA, SoWs widely.' },
+      { v: 'unknown',          l: "I don't know; I need help to find it out." },
+    ]
+  },
+  {
+    id: 'q2', num: 2, type: 'radio', badge: 'context', section: null,
+    title: 'Are you using AI for SDLC on your project?',
+    scoreKey: null,
+    opts: [
+      { v: 'using',      l: 'Using AI for SDLC' },
+      { v: 'discussion', l: 'Under discussion / elaboration with client' },
+      { v: 'not_using',  l: 'Not using AI' },
+    ]
+  },
+  // ── Scoring questions ──
+  {
+    id: 'q3', num: 3, type: 'radio', badge: 'scoring', section: 'Scoring Criteria',
+    title: 'Daily active usage — person has at least one AI interaction per day (DAU)',
+    scoreKey: 'dau',
+    opts: [
+      { v: '80plus',       l: 'DAU is more than 80%' },
+      { v: '70-80',        l: 'DAU is 70%–80%' },
+      { v: '50-69',        l: 'DAU is 50%–69%' },
+      { v: '30-49',        l: 'DAU is 30%–49%' },
+      { v: 'sub30',        l: 'DAU is less than 30%' },
+      { v: 'not_measured', l: 'Not measured' },
+    ]
+  },
+  {
+    id: 'q4', num: 4, type: 'radio', badge: 'scoring', section: null,
+    title: 'Productivity metrics tracking (throughput, cycle time, quality)',
+    scoreKey: 'metrics',
+    opts: [
+      { v: 'all_three', l: 'I track cycle time AND throughput AND quality' },
+      { v: 'partial',   l: 'I track productivity partially: cycle time OR throughput OR quality' },
+      { v: 'none',      l: 'I do not track any productivity metrics' },
+    ]
+  },
+  {
+    id: 'q5', num: 5, type: 'radio', badge: 'context', section: null,
+    title: 'What approach do you use to track productivity metrics?',
+    scoreKey: null,
+    opts: [
+      { v: 'automated', l: 'Automated (Jira, Azure DevOps, GitHub)' },
+      { v: 'surveys',   l: 'Surveys' },
+      { v: 'mixed',     l: 'Mixed (both automated and surveys)' },
+      { v: 'other',     l: 'Other' },
+    ]
+  },
+  {
+    id: 'q6', num: 6, type: 'radio', badge: 'scoring', section: null,
+    title: 'AI Champions presence on your project',
+    scoreKey: 'champions',
+    opts: [
+      { v: 'all_roles', l: 'I have AI Champions for all core roles on my project' },
+      { v: 'one',       l: 'I have one AI Champion' },
+      { v: 'none',      l: 'There are no AI Champions on my project' },
+    ]
+  },
+  {
+    id: 'q8', num: 8, type: 'radio', badge: 'scoring', section: null,
+    title: 'How do you ensure the reusability of AI artifacts?',
+    scoreKey: 'reusability',
+    opts: [
+      { v: 'codified',   l: 'Rules and custom agents are codified and managed as code (versioned in repositories), with continuous improvement loops.' },
+      { v: 'onboarding', l: 'Onboarding materials include shared prompts, rules, context, and custom agents reused across the team.' },
+      { v: 'none',       l: 'I have none of the above' },
+    ]
+  },
+  {
+    id: 'q9', num: 9, type: 'radio', badge: 'core', section: 'Core Criteria',
+    title: 'What % of your deliverables/tasks are created or meaningfully assisted by AI?',
+    scoreKey: 'deliverables',
+    opts: [
+      { v: '75plus',    l: '75% or more' },
+      { v: '50-74',     l: '50% to 74%' },
+      { v: '25-49',     l: '25% to 49%' },
+      { v: 'sub25',     l: 'Less than 25%' },
+      { v: 'setting_up',l: 'AI usage is in process of setting up' },
+    ]
+  },
+  {
+    id: 'q10', num: 10, type: 'radio', badge: 'scoring', section: null,
+    title: 'How do you track and manage the cost associated with AI usage?',
+    scoreKey: 'cost',
+    opts: [
+      { v: 'visibility_reviews', l: 'I have visibility into AI costs and conduct regular reviews to drive optimizations.' },
+      { v: 'visibility_only',    l: 'I have visibility into AI costs, but do NOT conduct regular reviews.' },
+      { v: 'no_visibility',      l: 'I do NOT have visibility into AI costs — owned/restricted by the client.' },
+    ]
+  },
+  {
+    id: 'q11', num: 11, type: 'radio', badge: 'core3', section: null,
+    title: 'What tools/ways of working do you use to create deliverables across roles?',
+    scoreKey: 'novel',
+    opts: [
+      { v: 'novel',     l: 'We mostly use Novel AI Tools (multi-agent, spec-driven, on-prem, automated pipelines)' },
+      { v: 'commodity', l: 'We mostly use Commodity AI Tools (chatbots, code review, MCP, simple agents)' },
+    ]
+  },
+  {
+    id: 'q12', num: 12, type: 'checkbox', badge: 'scoring', section: null,
+    title: 'Which AI-powered tools do you use to boost productivity? (select all that apply)',
+    scoreKey: 'tools',
+    opts: [
+      { v: 'elitea',        l: 'EPAM EliteA' },
+      { v: 'codemie',       l: 'EPAM CodeMie' },
+      { v: 'dial',          l: 'EPAM DIAL' },
+      { v: 'github_copilot',l: 'GitHub Copilot' },
+      { v: 'amazonq',       l: 'Amazon Q Developer' },
+      { v: 'gemini',        l: 'Gemini Code Assist' },
+      { v: 'ms_copilot',    l: 'MS Copilot' },
+      { v: 'cursor',        l: 'Cursor' },
+      { v: 'sourcegraph',   l: 'Sourcegraph / Amp' },
+      { v: 'windsurf',      l: 'Windsurf' },
+      { v: 'kiro',          l: 'Kiro' },
+      { v: 'claude',        l: 'Claude.ai / Claude Code' },
+      { v: 'custom_client', l: "Custom Client's AI tools" },
+      { v: 'other_tools',   l: 'Other' },
+    ]
+  },
+];
+
+// ── Scoring functions (mirrors the questionnaire) ──────────────────────────────
+function aqScoreDAU(v)         { if(!v) return null; if(v==='80plus'||v==='70-80') return 'l3'; if(v==='50-69') return 'l2'; if(v==='30-49') return 'partial'; return 'none'; }
+function aqScoreMetrics(v)     { if(!v) return null; if(v==='all_three') return 'l3'; if(v==='partial') return 'l2'; return 'none'; }
+function aqScoreCost(v)        { if(!v) return null; if(v==='visibility_reviews') return 'l3'; if(v==='visibility_only') return 'l2'; return 'partial'; }
+function aqScoreChampions(v)   { if(!v) return null; if(v==='all_roles') return 'l3'; if(v==='one') return 'l2'; return 'none'; }
+function aqScoreReusability(v) { if(!v) return null; if(v==='codified') return 'l3'; if(v==='onboarding') return 'l2'; return 'none'; }
+function aqScoreDeliverables(v){ if(!v) return null; if(v==='75plus') return 'l3'; if(v==='50-74') return 'l2'; if(v==='25-49'||v==='setting_up') return 'partial'; return 'none'; }
+function aqScoreNovel(v)       { if(!v) return null; if(v==='novel') return 'l3'; return 'l2'; }
+function aqScoreTools(vals)    { if(!vals||!vals.length) return null; if(vals.length>=3) return 'l3'; return 'l2'; }
+
+function calcAssessmentScores(answers) {
+  if (!answers) answers = {};
+  const scores = {
+    dau:          aqScoreDAU(answers.q3),
+    metrics:      aqScoreMetrics(answers.q4),
+    cost:         aqScoreCost(answers.q10),
+    champions:    aqScoreChampions(answers.q6),
+    reusability:  aqScoreReusability(answers.q8),
+    deliverables: aqScoreDeliverables(answers.q9),
+    novel:        aqScoreNovel(answers.q11),
+    tools:        aqScoreTools(answers.q12),
+  };
+  const meetsL2 = s => s==='l2'||s==='l3';
+  const meetsL3 = s => s==='l3';
+  const level2 = meetsL2(scores.deliverables) && meetsL2(scores.dau) && meetsL2(scores.metrics) &&
+                 meetsL2(scores.cost) && meetsL2(scores.champions) && meetsL2(scores.reusability) && meetsL2(scores.tools);
+  const level3 = level2 && meetsL3(scores.dau) && meetsL3(scores.metrics) && meetsL3(scores.cost) &&
+                 meetsL3(scores.champions) && meetsL3(scores.reusability) && meetsL3(scores.deliverables) &&
+                 meetsL3(scores.novel) && meetsL3(scores.tools);
+  const level = level3 ? 3 : level2 ? 2 : 1;
+  return { scores, level };
+}
+
+function setAnswer(qid, val, isCheckbox) {
+  const state = loadState();
+  if (!state) return;
+  if (!state.answers) state.answers = {};
+  if (isCheckbox) {
+    const current = state.answers[qid] || [];
+    const idx = current.indexOf(val);
+    if (idx === -1) state.answers[qid] = [...current, val];
+    else state.answers[qid] = current.filter(v => v !== val);
+  } else {
+    state.answers[qid] = val;
+  }
+  saveState(state);
+  renderAssessment(state);
+}
+
+function renderAssessment(state) {
+  if (!state.answers) state.answers = {};
+  const { scores, level: calcLevel } = calcAssessmentScores(state.answers);
+
+  const scoreLabelMap = { l3:'Level 3 ✓', l2:'Level 2 ✓', partial:'Partial', none:'Not yet', null:'—' };
+  const scoreCls      = { l3:'aq-score-l3', l2:'aq-score-l2', partial:'aq-score-partial', none:'aq-score-l1', null:'aq-score-l1' };
+
+  // Count answered scoring questions
+  const scoringQIds = ASSESSMENT_QUESTIONS.filter(q=>q.scoreKey).map(q=>q.id);
+  const answeredCount = scoringQIds.filter(id => {
+    const a = state.answers[id];
+    return a !== undefined && a !== null && (Array.isArray(a) ? a.length > 0 : true);
+  }).length;
+  const totalScoring = scoringQIds.length;
+
+  // Hero
+  const levelNames = ['','Exploring','AI-Enabled','AI-Native'];
+  const heroSub = answeredCount < totalScoring
+    ? `${answeredCount} of ${totalScoring} scoring questions answered`
+    : `Based on your answers · ${totalScoring}/${totalScoring} questions complete`;
+
+  let html = `<div class="assess-hero">
+    <div class="assess-level">
+      <div class="assess-lv-num">${calcLevel}</div>
+      <div>
+        <div class="assess-lv-label">Level ${calcLevel} — ${levelNames[calcLevel]}</div>
+        <div class="assess-lv-sub">${heroSub}</div>
+      </div>
+    </div>
+    <div class="assess-actions">
+      ${calcLevel > state.level ? `<button class="assess-save-btn" onclick="advanceLevelToAssessed(${calcLevel})">Save Level ${calcLevel} →</button>` : ''}
+    </div>
+  </div>`;
+
+  html += `<div class="aq-wrap">`;
+  let lastSection = null;
+  for (const q of ASSESSMENT_QUESTIONS) {
+    if (q.section && q.section !== lastSection) {
+      html += `<div class="aq-section-hdr">${q.section}</div>`;
+      lastSection = q.section;
+    }
+    const curVal = state.answers[q.id];
+    const isAnswered = q.type === 'checkbox' ? (Array.isArray(curVal) && curVal.length > 0) : !!curVal;
+
+    // Score badge for scoring questions
+    let scoreBadge = '';
+    if (q.scoreKey) {
+      const sc = scores[q.scoreKey];
+      scoreBadge = `<span class="aq-score-badge ${scoreCls[sc]}">${scoreLabelMap[sc]}</span>`;
+    }
+
+    // Badge chip
+    const badgeLabels = { core:'Core · L2', core3:'Core · L3', scoring:'Scoring', context:'Context' };
+    const badgeHtml = `<span class="aq-badge ${q.badge}">${badgeLabels[q.badge]||q.badge}</span>`;
+
+    html += `<div class="aq-card${isAnswered?' answered':''}">
+      <div class="aq-hdr">
+        <div class="aq-num${isAnswered?' done':''}">${q.num}</div>
+        <div class="aq-title">${q.title}${badgeHtml}</div>
+      </div>`;
+
+    if (q.type === 'checkbox') {
+      const selVals = Array.isArray(curVal) ? curVal : [];
+      html += `<div class="aq-opts aq-tools-grid">`;
+      for (const o of q.opts) {
+        const sel = selVals.includes(o.v);
+        html += `<div class="aq-opt${sel?' selected':''}" role="checkbox" aria-checked="${sel}" onclick="setAnswer('${q.id}','${o.v}',true)">
+          <span class="aq-opt-icon">${sel ? '☑' : '☐'}</span>
+          <span>${o.l}</span></div>`;
+      }
+      html += `</div>`;
+    } else {
+      html += `<div class="aq-opts">`;
+      for (const o of q.opts) {
+        const sel = curVal === o.v;
+        html += `<div class="aq-opt${sel?' selected':''}" role="radio" aria-checked="${sel}" onclick="setAnswer('${q.id}','${o.v}',false)">
+          <span class="aq-opt-icon">${sel ? '●' : '○'}</span>
+          <span>${o.l}</span></div>`;
+      }
+      html += `</div>`;
+    }
+
+    if (scoreBadge) html += scoreBadge;
+    html += `</div>`; // aq-card
+  }
+  html += `</div>`; // aq-wrap
+
+  document.getElementById('assess-content').innerHTML = html;
+}
+
+function advanceLevelToAssessed(newLevel) {
+  const state = loadState();
+  if (!state) return;
+  if (newLevel <= state.level) return;
+  if (!confirm(`Your answers indicate Level ${newLevel}. Update your quest board level to ${newLevel}?`)) return;
+  state.level = newLevel;
+  state.activeIds = selectActiveQuests(state).map(q => q.id);
+  saveState(state);
+  showApp(state);
+  switchTab('assessment');
+}
+
+// ── Roadmap ───────────────────────────────────────────────────────────────────
+
+function renderRoadmap(state) {
+  if (!state.answers) state.answers = {};
+  const a = state.answers; // shorthand
+
+  // ── Step definitions — ordered ideal path of least resistance ─────────────
+  // Each step: qKey (answer key), label, title, hint, isDone(answers), isPartial(answers), answerLabel(answers)
+  const PHASES = [
+    {
+      id: 'foundation', icon: '🏗️', label: 'Foundation',
+      steps: [
+        {
+          qKey: 'q1', q: 'Q1',
+          title: 'Confirm GenAI approval',
+          hint: 'Message your account manager or check the MSA/SoW. You need at least written approval before anything else matters.',
+          isDone:    a => ['restricted','written_approval','widely'].includes(a.q1),
+          isPartial: a => a.q1 === 'unknown',
+          answerLabel: a => ({ prohibited:'Prohibited by client', no_approval:'Not obtained yet', written_approval:'Written approval ✓', restricted:'Approved with restrictions ✓', widely:'Approved widely ✓', unknown:'Status unknown — follow up needed', })[a.q1] || null,
+        },
+      ]
+    },
+    {
+      id: 'start', icon: '🚀', label: 'Start using AI',
+      steps: [
+        {
+          qKey: 'q12', q: 'Q12',
+          title: 'Pick your AI tools and get team access',
+          hint: 'Select at least one tool and make sure the team can use it. EliteA, CodeMie, GitHub Copilot, Cursor — whatever fits your stack.',
+          isDone:    a => Array.isArray(a.q12) && a.q12.length >= 1,
+          isPartial: a => false,
+          answerLabel: a => Array.isArray(a.q12) && a.q12.length ? `${a.q12.length} tool${a.q12.length>1?'s':''} selected ✓` : null,
+        },
+        {
+          qKey: 'q6', q: 'Q6',
+          title: 'Nominate one AI Champion',
+          hint: 'One person who owns AI adoption: runs sessions, maintains shared resources, and keeps the team moving forward.',
+          isDone:    a => ['one','all_roles'].includes(a.q6),
+          isPartial: a => false,
+          answerLabel: a => ({ none:'No champion yet', one:'One champion ✓', all_roles:'All core roles covered ✓' })[a.q6] || null,
+        },
+      ]
+    },
+    {
+      id: 'measure', icon: '📊', label: 'Measure your baseline',
+      steps: [
+        {
+          qKey: 'q3', q: 'Q3',
+          title: 'Establish DAU measurement',
+          hint: 'Set up telemetry (GitHub Copilot metrics, Azure Monitor) or run a team survey. You can\'t improve what you don\'t measure.',
+          isDone:    a => ['sub30','30-49','50-69','70-80','80plus'].includes(a.q3),
+          isPartial: a => a.q3 === 'not_measured',
+          answerLabel: a => ({ 'not_measured':'Not measured yet', sub30:'< 30% DAU', '30-49':'30–49% DAU', '50-69':'50–69% DAU ✓', '70-80':'70–80% DAU ✓', '80plus':'> 80% DAU ✓' })[a.q3] || null,
+        },
+        {
+          qKey: 'q4', q: 'Q4',
+          title: 'Start tracking at least one productivity metric',
+          hint: 'Throughput, cycle time, or quality — pick whichever you can measure today. Automated tools (Jira, ADO) are easiest.',
+          isDone:    a => ['partial','all_three'].includes(a.q4),
+          isPartial: a => false,
+          answerLabel: a => ({ none:'Not tracked yet', partial:'Tracking 1–2 metric types ✓', all_three:'All 3 tracked ✓' })[a.q4] || null,
+        },
+        {
+          qKey: 'q9', q: 'Q9',
+          title: 'Audit your current AI-assisted deliverables %',
+          hint: 'Estimate what share of primary outputs (code, test cases, user stories) are meaningfully AI-assisted today. Any answer starts the picture.',
+          isDone:    a => ['setting_up','sub25','25-49','50-74','75plus'].includes(a.q9),
+          isPartial: a => false,
+          answerLabel: a => ({ setting_up:'Setting up', sub25:'< 25%', '25-49':'25–49%', '50-74':'50–74% ✓', '75plus':'75%+ ✓' })[a.q9] || null,
+        },
+      ]
+    },
+    {
+      id: 'build', icon: '🔨', label: 'Build team habits',
+      steps: [
+        {
+          qKey: 'q8', q: 'Q8',
+          title: 'Share AI artifacts with the team',
+          hint: 'Collect the best prompts, rules, and agents. Add them to onboarding materials so knowledge doesn\'t stay siloed with individuals.',
+          isDone:    a => ['onboarding','codified'].includes(a.q8),
+          isPartial: a => false,
+          answerLabel: a => ({ none:'Nothing shared yet', onboarding:'In onboarding materials ✓', codified:'Managed as code ✓' })[a.q8] || null,
+        },
+        {
+          qKey: 'q10', q: 'Q10',
+          title: 'Get visibility into AI costs',
+          hint: 'Create an inventory of licenses and inference spend. Even partial visibility (or noting client restriction) establishes baseline awareness.',
+          isDone:    a => ['visibility_only','visibility_reviews'].includes(a.q10),
+          isPartial: a => a.q10 === 'no_visibility',
+          answerLabel: a => ({ no_visibility:'Client-restricted — noted', visibility_only:'Visibility established ✓', visibility_reviews:'Visibility + reviews ✓' })[a.q10] || null,
+        },
+      ]
+    },
+  ];
+
+  const L2_GATE_STEPS = [
+    {
+      qKey: 'q3', q: 'Q3',
+      title: 'Grow DAU to 50%+',
+      hint: 'Champion-led sessions and visible wins drive adoption. Half the team should be using AI tools every single day.',
+      isDone:    a => ['50-69','70-80','80plus'].includes(a.q3),
+      isPartial: a => ['sub30','30-49'].includes(a.q3),
+      answerLabel: a => ({ sub30:'< 30% — needs growth', '30-49':'30–49% — getting there', '50-69':'50–69% ✓', '70-80':'70–80% ✓', '80plus':'> 80% ✓' })[a.q3] || null,
+    },
+    {
+      qKey: 'q9', q: 'Q9', isCore: true,
+      title: 'AI-assisted deliverables ≥ 50%',
+      hint: 'The key Level 2 gate. Primary outputs for each core role should be meaningfully AI-assisted more often than not.',
+      isDone:    a => ['50-74','75plus'].includes(a.q9),
+      isPartial: a => ['25-49','setting_up'].includes(a.q9),
+      answerLabel: a => ({ setting_up:'Setting up', sub25:'< 25%', '25-49':'25–49% — keep going', '50-74':'50–74% ✓', '75plus':'75%+ ✓' })[a.q9] || null,
+    },
+    {
+      qKey: 'q6', q: 'Q6',
+      title: 'Champion runs regular AI sessions',
+      hint: 'The champion should hold recurring sessions: demos, workshops, prompt reviews. This is what moves the DAU needle.',
+      isDone:    a => ['one','all_roles'].includes(a.q6),
+      isPartial: a => false,
+      answerLabel: a => ({ none:'No champion yet', one:'Active champion ✓', all_roles:'All roles covered ✓' })[a.q6] || null,
+    },
+  ];
+
+  const SCALE_PHASES = [
+    {
+      id: 'scale', icon: '📈', label: 'Scale across the team',
+      steps: [
+        {
+          qKey: 'q6', q: 'Q6',
+          title: 'Champions for all core roles',
+          hint: 'Every core role (Dev, QA, BA/PM) needs its own champion with defined activities. This is what takes you from good to great.',
+          isDone:    a => a.q6 === 'all_roles',
+          isPartial: a => a.q6 === 'one',
+          answerLabel: a => ({ none:'None yet', one:'One champion — expand to all roles', all_roles:'All roles covered ✓' })[a.q6] || null,
+        },
+        {
+          qKey: 'q4', q: 'Q4',
+          title: 'Track all 3 metric types',
+          hint: 'Add cycle time and quality to whatever you already measure. Full picture of throughput + cycle time + quality.',
+          isDone:    a => a.q4 === 'all_three',
+          isPartial: a => a.q4 === 'partial',
+          answerLabel: a => ({ none:'Not tracked', partial:'1–2 types — add the rest', all_three:'All 3 tracked ✓' })[a.q4] || null,
+        },
+        {
+          qKey: 'q8', q: 'Q8',
+          title: 'Codify AI artifacts as code',
+          hint: 'Move shared docs into source-controlled rules and agents. PR reviews, versioning, and continuous improvement loops.',
+          isDone:    a => a.q8 === 'codified',
+          isPartial: a => a.q8 === 'onboarding',
+          answerLabel: a => ({ none:'Nothing shared', onboarding:'In onboarding — move to code', codified:'Managed as code ✓' })[a.q8] || null,
+        },
+      ]
+    },
+  ];
+
+  const L3_GATE_STEPS = [
+    {
+      qKey: 'q3', q: 'Q3',
+      title: 'DAU ≥ 70%',
+      hint: 'Most of the team uses AI daily. High-frequency usage is the norm, not the exception.',
+      isDone:    a => ['70-80','80plus'].includes(a.q3),
+      isPartial: a => a.q3 === '50-69',
+      answerLabel: a => ({ '50-69':'50–69% — push to 70%', '70-80':'70–80% ✓', '80plus':'> 80% ✓' })[a.q3] || null,
+    },
+    {
+      qKey: 'q9', q: 'Q9',
+      title: 'AI-assisted deliverables ≥ 75%',
+      hint: 'AI is the default for all primary deliverables. Not a stretch goal — the default.',
+      isDone:    a => a.q9 === '75plus',
+      isPartial: a => a.q9 === '50-74',
+      answerLabel: a => ({ '50-74':'50–74% — push to 75%', '75plus':'75%+ ✓' })[a.q9] || null,
+    },
+    {
+      qKey: 'q10', q: 'Q10',
+      title: 'Run regular AI cost optimization reviews',
+      hint: 'Active reviews to improve output-vs-cost ratio. Not just monitoring — taking action on what you see.',
+      isDone:    a => a.q10 === 'visibility_reviews',
+      isPartial: a => a.q10 === 'visibility_only',
+      answerLabel: a => ({ no_visibility:'No visibility', visibility_only:'Visibility only — add reviews', visibility_reviews:'Visibility + reviews ✓' })[a.q10] || null,
+    },
+    {
+      qKey: 'q12', q: 'Q12',
+      title: '3 or more AI tools in active use',
+      hint: 'Multiple tools across different roles and use cases. Breadth reflects deep, durable adoption.',
+      isDone:    a => Array.isArray(a.q12) && a.q12.length >= 3,
+      isPartial: a => Array.isArray(a.q12) && a.q12.length > 0 && a.q12.length < 3,
+      answerLabel: a => Array.isArray(a.q12) && a.q12.length ? `${a.q12.length} tool${a.q12.length>1?'s':''} — ${a.q12.length>=3?'✓':'need '+(3-a.q12.length)+' more'}` : null,
+    },
+    {
+      qKey: 'q11', q: 'Q11', isCore: true,
+      title: 'Novel AI tools in production',
+      hint: 'Multi-agent orchestration, spec-driven approaches, on-prem deployment, or automated pipelines — genuinely embedded in core workflows.',
+      isDone:    a => a.q11 === 'novel',
+      isPartial: a => a.q11 === 'commodity',
+      answerLabel: a => ({ commodity:'Commodity tools — explore novel approaches', novel:'Novel tools in production ✓' })[a.q11] || null,
+    },
+  ];
+
+  // ── Status helpers ─────────────────────────────────────────────────────────
+  function stepStatus(step) {
+    if (step.isDone(a))    return 'done';
+    if (step.isPartial(a)) return 'active';
+    return 'pending';
+  }
+
+  function circleIcon(status) {
+    if (status === 'done')   return '✓';
+    if (status === 'active') return '→';
+    return '';
+  }
+
+  // Count total completable steps and done count for progress bar
+  const allSteps = [
+    ...PHASES.flatMap(p => p.steps),
+    ...L2_GATE_STEPS,
+    ...SCALE_PHASES.flatMap(p => p.steps),
+    ...L3_GATE_STEPS,
+  ];
+  const doneCount = allSteps.filter(s => s.isDone(a)).length;
+  const progressPct = Math.round(doneCount / allSteps.length * 100);
+
+  // Check gates
+  const l2Met = L2_GATE_STEPS.every(s => s.isDone(a));
+  const l3Met = L3_GATE_STEPS.every(s => s.isDone(a));
+
+  // ── Renderers ──────────────────────────────────────────────────────────────
+  function renderStep(step, isLast) {
+    const status = stepStatus(step);
+    const lbl = step.answerLabel(a);
+    return `
+      <div class="rm-step">
+        <div class="rm-step-left">
+          <div class="rm-step-circle ${status}">${circleIcon(status)}</div>
+          ${!isLast ? `<div class="rm-step-line ${status === 'done' ? 'done' : ''}"></div>` : ''}
+        </div>
+        <div class="rm-step-body">
+          <div class="rm-step-hdr">
+            <span class="rm-step-q">${step.q}</span>
+            <span class="rm-step-title ${status}">${step.title}${step.isCore ? ' <span class="rm-step-core">★ Core</span>' : ''}</span>
+          </div>
+          <div class="rm-step-hint">${step.hint}</div>
+          ${lbl ? `<div class="rm-step-answer ${status}">${lbl}</div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function renderPhase(phase) {
+    return `
+      <div class="rm-phase">
+        <span class="rm-phase-icon">${phase.icon}</span>
+        <span class="rm-phase-label">${phase.label}</span>
+        <div class="rm-phase-line"></div>
+      </div>
+      ${phase.steps.map((s, i) => renderStep(s, i === phase.steps.length - 1)).join('')}`;
+  }
+
+  function renderGateSteps(steps, gateClass, gateIcon, gateTitle, gateSub, isMet) {
+    const stepsHtml = steps.map((s, i) => renderStep(s, i === steps.length - 1)).join('');
+    return `
+      <div class="rm-gate ${gateClass}">
+        <div class="rm-gate-icon">${gateIcon}</div>
+        <div class="rm-gate-text">
+          <div class="rm-gate-title">${gateTitle}</div>
+          <div class="rm-gate-sub">${gateSub}</div>
+        </div>
+        <div class="rm-gate-check ${isMet ? 'met' : 'unmet'}">${isMet ? 'Gate met ✓' : 'Not yet'}</div>
+      </div>
+      ${stepsHtml}`;
+  }
+
+  // ── Build HTML ─────────────────────────────────────────────────────────────
+  let html = `<div class="roadmap-wrap">
+    <div class="roadmap-header">
+      <h2>🗺️ Ideal Path to AI Maturity</h2>
+      <p>The path of least resistance from Level 1 → Level 2 → Level 3. Each step is based on the questionnaire — your current answers are reflected in real time.</p>
+      <div class="rm-progress-bar"><div class="rm-progress-fill" style="width:${progressPct}%"></div></div>
+      <div class="rm-progress-label"><span>${doneCount} of ${allSteps.length} steps achieved</span><span>${progressPct}%</span></div>
+    </div>`;
+
+  // Foundation + Start + Measure + Build
+  for (const phase of PHASES) {
+    html += renderPhase(phase);
+  }
+
+  // L2 gate
+  html += renderGateSteps(
+    L2_GATE_STEPS,
+    'gate-l2',
+    '⭐',
+    'Level 2 Gate — AI-Enabled',
+    'AI-Assisted Deliverables ≥ 50% plus all scoring criteria at Level 2',
+    l2Met
+  );
+
+  // Scale phases
+  for (const phase of SCALE_PHASES) {
+    html += renderPhase(phase);
+  }
+
+  // L3 gate
+  html += renderGateSteps(
+    L3_GATE_STEPS,
+    'gate-l3',
+    '🏆',
+    'Level 3 Gate — AI-Native',
+    'Novel AI tools in production plus all criteria at Level 3',
+    l3Met
+  );
+
+  html += `</div>`; // roadmap-wrap
+  document.getElementById('roadmap-content').innerHTML = html;
+}
+
+function jumpToQuest(questId) {
+  switchTab('quests');
+  setTimeout(() => {
+    const el = document.getElementById(`card-${questId}`);
+    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 150);
+}
+
+// ── Theme ─────────────────────────────────────────────────────────────────────
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = theme === 'light' ? '🌙' : '☀️';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  // If not explicitly set, read computed (system pref)
+  const isDark = current === 'dark' || (!current && !window.matchMedia('(prefers-color-scheme: light)').matches);
+  const next = isDark ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem('ai_quest_theme', next); } catch(e) {}
+}
+
+function initTheme() {
+  try {
+    const saved = localStorage.getItem('ai_quest_theme');
+    if (saved) {
+      applyTheme(saved);
+    } else {
+      // Reflect system preference in the button icon without forcing an override
+      const preferLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+      const btn = document.getElementById('theme-toggle');
+      if (btn) btn.textContent = preferLight ? '🌙' : '☀️';
+    }
+  } catch(e) {}
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  const state = loadState();
+  if (state && state.level && Array.isArray(state.completedIds)) {
+    // returning user — ensure activeIds are populated
+    if (!state.activeIds || state.activeIds.length === 0) {
+      state.activeIds = selectActiveQuests(state).map(q => q.id);
+      saveState(state);
+    }
+    showApp(state);
+  } else {
+    // first visit — show setup
+    document.getElementById('setup-screen').style.display = 'flex';
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI SDLC Maturity — Level Requirements Matrix</title>
+  <style>
+    :root {
+      --primary: #5B4FCF;
+      --primary-dark: #3E33A3;
+      --text: #1A1A2E;
+      --text-muted: #6B7280;
+      --border: #E2E4F0;
+      --bg: #F7F8FC;
+      --white: #FFFFFF;
+      --surface: #F0F2FA;
+      --radius: 10px;
+
+      --l1-bg: #F5F5F5;
+      --l1-hdr: #757575;
+      --l1-accent: #9E9E9E;
+      --l2-bg: #E3F0FF;
+      --l2-hdr: #1565C0;
+      --l2-accent: #1976D2;
+      --l3-bg: #FFF8E1;
+      --l3-hdr: #E65100;
+      --l3-accent: #F57C00;
+
+      --core-bg: #FBE9E7;
+      --core-color: #BF360C;
+      --core3-bg: #FFF3E0;
+      --core3-color: #E65100;
+      --scoring-bg: #EDE7F6;
+      --scoring-color: #4527A0;
+      --context-bg: #E8EAF6;
+      --context-color: #283593;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #3E33A3 0%, #5B4FCF 60%, #7B6FF0 100%);
+      color: white;
+      padding: 36px 40px 28px;
+    }
+    .header-inner { max-width: 1200px; margin: 0 auto; }
+    .header-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px; padding: 4px 14px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .header h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+    .header p  { font-size: 14px; opacity: .85; max-width: 560px; line-height: 1.6; }
+    .legend { display: flex; gap: 20px; margin-top: 18px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; opacity: .9; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Main ── */
+    .main { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    /* ── Level summary cards ── */
+    .level-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+    .level-card {
+      border-radius: var(--radius); padding: 20px 22px; border: 1px solid transparent;
+      position: relative; overflow: hidden;
+    }
+    .level-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+    .lc-1 { background: var(--l1-bg); border-color: #BDBDBD; }
+    .lc-1::before { background: var(--l1-hdr); }
+    .lc-2 { background: var(--l2-bg); border-color: #90CAF9; }
+    .lc-2::before { background: var(--l2-hdr); }
+    .lc-3 { background: var(--l3-bg); border-color: #FFCC80; }
+    .lc-3::before { background: var(--l3-hdr); }
+    .lc-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+    .lc-1 .lc-badge { color: var(--l1-hdr); }
+    .lc-2 .lc-badge { color: var(--l2-hdr); }
+    .lc-3 .lc-badge { color: var(--l3-hdr); }
+    .lc-name { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .lc-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    .lc-gate { margin-top: 12px; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px; }
+    .lc-1 .lc-gate { background: rgba(0,0,0,.05); color: var(--text-muted); }
+    .lc-2 .lc-gate { background: rgba(21,101,192,.1); color: var(--l2-hdr); }
+    .lc-3 .lc-gate { background: rgba(230,81,0,.1); color: var(--l3-hdr); }
+
+    /* ── Matrix table ── */
+    .matrix-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+
+    /* Column headers */
+    thead th {
+      padding: 14px 18px; font-size: 13px; font-weight: 700; text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+    thead th:first-child { width: 190px; background: var(--white); }
+    th.hdr-l1 { background: var(--l1-bg); color: var(--l1-hdr); border-top: 4px solid var(--l1-hdr); }
+    th.hdr-l2 { background: var(--l2-bg); color: var(--l2-hdr); border-top: 4px solid var(--l2-hdr); }
+    th.hdr-l3 { background: var(--l3-bg); color: var(--l3-hdr); border-top: 4px solid var(--l3-hdr); }
+    .hdr-sub  { font-size: 11px; font-weight: 500; opacity: .75; margin-top: 2px; }
+
+    /* Section separator rows */
+    tr.section-row td {
+      background: var(--surface);
+      font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted); padding: 7px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Data rows */
+    tbody tr:not(.section-row) {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+    tbody tr:not(.section-row):hover td { background: rgba(91,79,207,.03); }
+
+    /* Criterion label cell */
+    td.crit-label {
+      padding: 16px 18px; font-size: 13px; font-weight: 700;
+      background: var(--white); vertical-align: top; border-right: 1px solid var(--border);
+      min-width: 175px;
+    }
+    .crit-name { line-height: 1.4; margin-bottom: 5px; }
+    .crit-badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: .4px;
+    }
+    .badge-core    { background: var(--core-bg);    color: var(--core-color); }
+    .badge-core3   { background: var(--core3-bg);   color: var(--core3-color); }
+    .badge-scoring { background: var(--scoring-bg); color: var(--scoring-color); }
+    .badge-context { background: var(--context-bg); color: var(--context-color); }
+
+    /* Level cells */
+    td.cell-l1, td.cell-l2, td.cell-l3 {
+      padding: 14px 16px; font-size: 13px; line-height: 1.5;
+      vertical-align: top; min-width: 200px;
+    }
+    td.cell-l1 { background: #FAFAFA; }
+    td.cell-l2 { background: #F5F9FF; }
+    td.cell-l3 { background: #FFFDF5; }
+
+    .cell-state {
+      display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px;
+    }
+    .cell-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+    .cell-text { flex: 1; }
+    .cell-value {
+      font-weight: 600; color: var(--text); display: block; margin-bottom: 3px;
+    }
+    .cell-detail { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+    /* Threshold pill */
+    .threshold {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      padding: 2px 9px; border-radius: 12px; margin-top: 6px;
+    }
+    .thr-none    { background: #F5F5F5; color: #9E9E9E; border: 1px solid #E0E0E0; }
+    .thr-partial { background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; }
+    .thr-l2      { background: #E3F0FF; color: #1565C0; border: 1px solid #90CAF9; }
+    .thr-l3      { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+    .thr-core    { background: var(--core-bg); color: var(--core-color); border: 1px solid #FFAB91; font-size: 11px; }
+    .thr-core3   { background: var(--core3-bg); color: var(--core3-color); border: 1px solid #FFCC80; font-size: 11px; }
+
+    /* Gate row */
+    tr.gate-row td {
+      padding: 10px 18px; font-size: 12px; font-weight: 700;
+      border-bottom: 2px solid;
+    }
+    tr.gate-l2 td { background: rgba(21,101,192,.06); color: var(--l2-hdr); border-color: var(--l2-accent); }
+    tr.gate-l3 td { background: rgba(230,81,0,.06);   color: var(--l3-hdr); border-color: var(--l3-accent); }
+
+    /* Notes section */
+    .notes { margin-top: 32px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .note-card {
+      background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .note-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .note-card p  { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .note-card ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+    .note-card li { font-size: 12px; color: var(--text-muted); padding-left: 14px; position: relative; line-height: 1.5; }
+    .note-card li::before { content: '•'; position: absolute; left: 0; color: var(--primary); }
+
+    @media (max-width: 700px) {
+      .level-cards { grid-template-columns: 1fr; }
+      .notes { grid-template-columns: 1fr; }
+      .header { padding: 24px 20px 20px; }
+      .main { padding: 20px 12px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-badge">📊 Reference Matrix</div>
+    <h1>AI SDLC Maturity — Level Requirements</h1>
+    <p>What each criterion requires at every level — from Level 1 Exploring through Level 3 AI-Native. Use this as a calibration guide when self-assessing your project.</p>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#9E9E9E"></div> Level 1 — Exploring</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1976D2"></div> Level 2 — AI-Enabled (gate: AI Deliverables ≥ 50%)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#F57C00"></div> Level 3 — AI-Native (gate: Novel Tools in production)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#BF360C"></div> ★ Core criterion — must meet threshold to advance level</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Level summary cards -->
+  <div class="level-cards">
+    <div class="level-card lc-1">
+      <div class="lc-badge">Level 1</div>
+      <div class="lc-name">Exploring</div>
+      <div class="lc-desc">Team is experimenting with AI tools. No consistent workflows, limited measurement. AI usage is individual and ad hoc.</div>
+      <div class="lc-gate">Starting state — no gate required</div>
+    </div>
+    <div class="level-card lc-2">
+      <div class="lc-badge">Level 2</div>
+      <div class="lc-name">AI-Enabled</div>
+      <div class="lc-desc">AI is embedded in team workflows. Deliverables are consistently AI-assisted, champions drive adoption, and usage is measured.</div>
+      <div class="lc-gate">★ Gate: AI-Assisted Deliverables ≥ 50% + all scoring criteria ≥ L2</div>
+    </div>
+    <div class="level-card lc-3">
+      <div class="lc-badge">Level 3</div>
+      <div class="lc-name">AI-Native</div>
+      <div class="lc-desc">Novel AI approaches (multi-agent, spec-driven, on-prem) are in production. All criteria at L3 thresholds. AI is a core engineering capability.</div>
+      <div class="lc-gate">★ Gate: Novel AI Tools in production + all criteria ≥ L3</div>
+    </div>
+  </div>
+
+  <!-- Matrix -->
+  <div class="matrix-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="background:var(--white);">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Criterion</div>
+          </th>
+          <th class="hdr-l1">
+            Level 1 — Exploring
+            <div class="hdr-sub">Starting state</div>
+          </th>
+          <th class="hdr-l2">
+            Level 2 — AI-Enabled
+            <div class="hdr-sub">Consistent AI adoption</div>
+          </th>
+          <th class="hdr-l3">
+            Level 3 — AI-Native
+            <div class="hdr-sub">Novel AI in production</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- ── CONTEXT ── -->
+        <tr class="section-row"><td colspan="4">Context — informational, not scored</td></tr>
+
+        <!-- Q1: GenAI Approval -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">✅ GenAI Approval</div>
+            <span class="crit-badge badge-context">Context</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">📋</span>
+              <div class="cell-text">
+                <span class="cell-value">Status unknown or no approval</span>
+                <span class="cell-detail">Client may prohibit, or approval not yet obtained. Must investigate.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">Any status</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">📝</span>
+              <div class="cell-text">
+                <span class="cell-value">Written or restricted approval</span>
+                <span class="cell-detail">Written client approval obtained, or approved in MSA/SoW with restrictions on specific tools.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l2">Approval confirmed</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">✅</span>
+              <div class="cell-text">
+                <span class="cell-value">Wide approval in MSA/SoW</span>
+                <span class="cell-detail">AI usage approved broadly — different tools at team's discretion, no restrictions.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l3">Approved widely</span>
+          </td>
+        </tr>
+
+        <!-- Q2: Using AI for SDLC -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">🤖 AI for SDLC</div>
+            <span class="crit-badge badge-context">Context</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">💬</span>
+              <div class="cell-text">
+                <span class="cell-value">Under discussion or not yet started</span>
+                <span class="cell-detail">Team may be in elaboration mode with client, or AI not yet in use.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">Any state</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">⚙️</span>
+              <div class="cell-text">
+                <span class="cell-value">Actively using AI for SDLC</span>
+                <span class="cell-detail">AI is embedded in at least some core SDLC workflows across the team.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l2">Using AI</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">🚀</span>
+              <div class="cell-text">
+                <span class="cell-value">AI is central to SDLC</span>
+                <span class="cell-detail">AI is not optional — it is the primary way the team delivers across all core roles.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l3">AI-first delivery</span>
+          </td>
+        </tr>
+
+        <!-- ── SCORING ── -->
+        <tr class="section-row"><td colspan="4">Scoring criteria — all must meet threshold for level advancement</td></tr>
+
+        <!-- Q3: DAU -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">📊 Daily Active Usage (DAU)</div>
+            <span class="crit-badge badge-scoring">Scoring</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">📉</span>
+              <div class="cell-text">
+                <span class="cell-value">Less than 30% or not measured</span>
+                <span class="cell-detail">Usage is individual and inconsistent. No telemetry or survey in place to track daily usage.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">&lt; 30% or unmeasured</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">📈</span>
+              <div class="cell-text">
+                <span class="cell-value">DAU ≥ 50%</span>
+                <span class="cell-detail">More than half the team has at least one AI interaction per day. Measured via telemetry or survey.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l2">≥ 50% DAU</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">🔥</span>
+              <div class="cell-text">
+                <span class="cell-value">DAU ≥ 70%</span>
+                <span class="cell-detail">Majority of the team uses AI tools daily. High-frequency usage is the norm, not the exception.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l3">≥ 70% DAU</span>
+          </td>
+        </tr>
+
+        <!-- Q4 + Q5: Metrics -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">📈 Performance Metrics</div>
+            <span class="crit-badge badge-scoring">Scoring</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">❌</span>
+              <div class="cell-text">
+                <span class="cell-value">No metrics tracked</span>
+                <span class="cell-detail">No throughput, cycle time, or quality metrics are measured for AI-assisted work.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">No tracking</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">📋</span>
+              <div class="cell-text">
+                <span class="cell-value">Tracking at least one metric type</span>
+                <span class="cell-detail">Throughput <em>or</em> cycle time <em>or</em> quality is tracked. Automated (Jira/ADO) or survey-based.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l2">≥ 1 metric type</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">📊</span>
+              <div class="cell-text">
+                <span class="cell-value">All 3 metric types tracked</span>
+                <span class="cell-detail">Throughput <em>and</em> cycle time <em>and</em> quality are all measured and reviewed regularly.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l3">All 3 tracked</span>
+          </td>
+        </tr>
+
+        <!-- Q6: Champions -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">🏆 AI Champions</div>
+            <span class="crit-badge badge-scoring">Scoring</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">🚫</span>
+              <div class="cell-text">
+                <span class="cell-value">No AI Champion</span>
+                <span class="cell-detail">No dedicated person is driving AI adoption, running sessions, or maintaining shared resources.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">None</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">🌟</span>
+              <div class="cell-text">
+                <span class="cell-value">At least one AI Champion</span>
+                <span class="cell-detail">One champion nominated and active — running sessions, maintaining prompt library, supporting team AI use.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l2">≥ 1 champion</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">👥</span>
+              <div class="cell-text">
+                <span class="cell-value">Champions for all core roles</span>
+                <span class="cell-detail">Every core role (Dev, QA, BA/PM, etc.) has a dedicated AI Champion with defined activities.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l3">All core roles</span>
+          </td>
+        </tr>
+
+        <!-- Q8: Artifacts / Reusability -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">📁 AI Artifacts Reusability</div>
+            <span class="crit-badge badge-scoring">Scoring</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">🚫</span>
+              <div class="cell-text">
+                <span class="cell-value">No shared AI artifacts</span>
+                <span class="cell-detail">Each person builds their own prompts. No shared library, rules, or agents exist. Knowledge is siloed.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">None</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">📂</span>
+              <div class="cell-text">
+                <span class="cell-value">Onboarding includes shared assets</span>
+                <span class="cell-detail">Shared prompts, rules, context files, and custom agents are part of onboarding and reused consistently.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l2">Shared in onboarding</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">💻</span>
+              <div class="cell-text">
+                <span class="cell-value">Codified as code in repositories</span>
+                <span class="cell-detail">Rules and agents are versioned, PR-reviewed, and stored in source control. Continuous improvement loops in place.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l3">Managed as code</span>
+          </td>
+        </tr>
+
+        <!-- Q10: Cost -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">💰 AI Cost Tracking</div>
+            <span class="crit-badge badge-scoring">Scoring</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">❓</span>
+              <div class="cell-text">
+                <span class="cell-value">No visibility into AI costs</span>
+                <span class="cell-detail">License and inference costs are unknown or client-restricted. No inventory of AI spend exists.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">No visibility</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">👁️</span>
+              <div class="cell-text">
+                <span class="cell-value">Visibility into costs</span>
+                <span class="cell-detail">License and inference costs are tracked and visible. No regular optimization reviews required at this level.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l2">Costs visible</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">🔍</span>
+              <div class="cell-text">
+                <span class="cell-value">Visibility + regular optimization reviews</span>
+                <span class="cell-detail">Cost reviews are conducted regularly to drive optimizations and improve output-vs-cost ratio.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l3">Visibility + reviews</span>
+          </td>
+        </tr>
+
+        <!-- Q12: Tools -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">🔧 AI Tools in Use</div>
+            <span class="crit-badge badge-scoring">Scoring</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">🔍</span>
+              <div class="cell-text">
+                <span class="cell-value">Personal or trial use</span>
+                <span class="cell-detail">1–2 tools used by individuals. No team-wide rollout. No consistent licensing across roles.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">1–2 tools, personal</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">🛠️</span>
+              <div class="cell-text">
+                <span class="cell-value">Full team licensed (1+ tools)</span>
+                <span class="cell-detail">At least one AI tool is licensed and available to all team members. Consistent access established.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l2">Team licensed</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">🧰</span>
+              <div class="cell-text">
+                <span class="cell-value">3 or more tools in active use</span>
+                <span class="cell-detail">Multiple tools are actively used across different roles and use cases. Breadth reflects maturity.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l3">≥ 3 tools active</span>
+          </td>
+        </tr>
+
+        <!-- ── LEVEL 2 GATE ── -->
+        <tr class="gate-row gate-l2">
+          <td colspan="4">⬆️ Level 2 Gate — all scoring criteria above must be ≥ Level 2 AND AI-Assisted Deliverables (below) must reach ≥ 50%</td>
+        </tr>
+
+        <!-- ── CORE CRITERIA ── -->
+        <tr class="section-row"><td colspan="4">Core criteria — level gates depend on these specifically</td></tr>
+
+        <!-- Q9: Deliverables (CORE L2) -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">📦 AI-Assisted Deliverables</div>
+            <span class="crit-badge badge-core">Core · L2</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">🔧</span>
+              <div class="cell-text">
+                <span class="cell-value">Less than 25% or setting up</span>
+                <span class="cell-detail">AI assists some individual tasks but is not embedded in team workflows. Most deliverables are still manual.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">&lt; 25% or setting up</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">⭐</span>
+              <div class="cell-text">
+                <span class="cell-value">≥ 50% of deliverables AI-assisted</span>
+                <span class="cell-detail">Primary outputs per core role (code, test cases, user stories) are mostly AI-assisted. This is the <strong>key Level 2 gate.</strong></span>
+              </div>
+            </div>
+            <span class="threshold thr-core">★ Gate: ≥ 50%</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">🏅</span>
+              <div class="cell-text">
+                <span class="cell-value">≥ 75% of deliverables AI-assisted</span>
+                <span class="cell-detail">AI is the default for creating all primary deliverables across all core roles. Near-total AI assistance.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l3">≥ 75%</span>
+          </td>
+        </tr>
+
+        <!-- ── LEVEL 3 GATE ── -->
+        <tr class="gate-row gate-l3">
+          <td colspan="4">⬆️ Level 3 Gate — all scoring criteria above must be ≥ Level 3 AND Novel AI Tools (below) must be in production</td>
+        </tr>
+
+        <!-- Q11: Novel Tools (CORE L3) -->
+        <tr>
+          <td class="crit-label">
+            <div class="crit-name">🚀 Novel AI Tools</div>
+            <span class="crit-badge badge-core3">Core · L3</span>
+          </td>
+          <td class="cell-l1">
+            <div class="cell-state">
+              <span class="cell-icon">💡</span>
+              <div class="cell-text">
+                <span class="cell-value">Commodity tools only</span>
+                <span class="cell-detail">Using standardized tools: chatbots, simple code review, GitHub Copilot-style completions, basic MCP integrations.</span>
+              </div>
+            </div>
+            <span class="threshold thr-none">Commodity only</span>
+          </td>
+          <td class="cell-l2">
+            <div class="cell-state">
+              <span class="cell-icon">⚙️</span>
+              <div class="cell-text">
+                <span class="cell-value">Commodity tools well-adopted</span>
+                <span class="cell-detail">Commodity tools are in consistent, team-wide use. Novel tools may be under research or PoC — not yet required.</span>
+              </div>
+            </div>
+            <span class="threshold thr-l2">Commodity adopted</span>
+          </td>
+          <td class="cell-l3">
+            <div class="cell-state">
+              <span class="cell-icon">⭐</span>
+              <div class="cell-text">
+                <span class="cell-value">Novel AI tools in production</span>
+                <span class="cell-detail">Multi-agent orchestration, spec-driven approaches, on-prem deployment, or automated scenario execution are actively used in core workflows. <strong>This is the key Level 3 gate.</strong></span>
+              </div>
+            </div>
+            <span class="threshold thr-core3">★ Gate: Novel in prod</span>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Notes -->
+  <div class="notes">
+    <div class="note-card">
+      <h4>📌 How Level Advancement Works</h4>
+      <ul>
+        <li>Every scoring criterion must meet its threshold — there is no partial averaging.</li>
+        <li>Level 2 requires AI-Assisted Deliverables ≥ 50% as a hard gate, plus all other scoring criteria ≥ L2.</li>
+        <li>Level 3 requires Novel AI Tools in production as a hard gate, plus every criterion at L3.</li>
+        <li>Context questions (Q1, Q2, Q5, Q7) inform the assessment but do not block level advancement.</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>🔬 Novel vs Commodity AI Tools</h4>
+      <ul>
+        <li><strong>Commodity:</strong> chatbots, code completions, MCP integrations, simple agents, performance analysis tools.</li>
+        <li><strong>Novel:</strong> multi-agent orchestration, spec-driven development, on-prem deployment, automated test/defect pipelines, complex agentic workflows.</li>
+        <li>Using Claude Code, Cursor, or Windsurf alone does not qualify as Novel — the workflow matters.</li>
+        <li>Evidence for Novel tools (source control screenshots, architecture docs) is required for L3 assessment.</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>📊 Evidence Requirements</h4>
+      <ul>
+        <li><strong>DAU:</strong> telemetry screenshot (GitHub Copilot metrics, Azure Monitor) or survey results.</li>
+        <li><strong>Deliverables %:</strong> written explanation of how % was derived, Jira AI-tag reports if available.</li>
+        <li><strong>Artifacts:</strong> Confluence / SharePoint / GitHub screenshots showing artifact names and dates.</li>
+        <li><strong>Novel tools:</strong> source control screenshots showing agentic code, pipeline configs, or architecture.</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>🤔 Common Questions</h4>
+      <ul>
+        <li><em>What counts as a "core role"?</em> Roles that collectively represent &gt; 80% of team headcount — typically Dev, QA, BA/PM.</li>
+        <li><em>AI Costs restricted by client?</em> Partial credit given — note it in the assessment. Not a blocker for L2.</li>
+        <li><em>Is Q5 (metrics approach) scored?</em> No — it's context only. Q4 (what you track) is what's scored.</li>
+        <li><em>Is Q7 (champion text) scored?</em> No — it provides evidence context for Q6 which is scored.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

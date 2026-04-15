@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI SDLC Maturity Assessment</title>
+  <style>
+    :root {
+      --primary: #5B4FCF;
+      --primary-dark: #3E33A3;
+      --primary-light: #EEF0FF;
+      --accent: #00C0A3;
+      --accent-light: #E0FAF6;
+      --text: #1A1A2E;
+      --text-muted: #6B7280;
+      --border: #E2E4F0;
+      --bg: #F7F8FC;
+      --white: #FFFFFF;
+      --radius: 10px;
+      --shadow: 0 2px 12px rgba(91,79,207,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #3E33A3 0%, #5B4FCF 60%, #7B6FF0 100%);
+      color: white; padding: 40px 32px 32px; position: relative; overflow: hidden;
+    }
+    .header::after { content:''; position:absolute; right:-60px; top:-60px; width:280px; height:280px; border-radius:50%; background:rgba(255,255,255,0.06); }
+    .header::before { content:''; position:absolute; right:80px; bottom:-80px; width:200px; height:200px; border-radius:50%; background:rgba(0,192,163,0.12); }
+    .header-inner { max-width:780px; margin:0 auto; position:relative; }
+    .header-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:20px; padding:4px 14px; font-size:12px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:14px; }
+    .header h1 { font-size:28px; font-weight:700; line-height:1.2; margin-bottom:10px; }
+    .header p { font-size:15px; opacity:0.85; max-width:560px; line-height:1.6; }
+    .progress-bar-wrap { margin-top:24px; background:rgba(255,255,255,0.2); border-radius:8px; height:6px; overflow:hidden; }
+    .progress-bar-fill { height:100%; background:var(--accent); border-radius:8px; transition:width 0.4s ease; width:0%; }
+    .progress-label { display:flex; justify-content:space-between; margin-top:6px; font-size:12px; opacity:0.8; }
+
+    /* ── Main ── */
+    .main { max-width:780px; margin:0 auto; padding:32px 24px 80px; }
+
+    /* ── Q Card ── */
+    .q-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px 28px 24px; margin-bottom:20px; box-shadow:var(--shadow); transition:box-shadow 0.2s; }
+    .q-card:hover { box-shadow:0 4px 20px rgba(91,79,207,0.12); }
+    .q-card.answered { border-left:3px solid var(--accent); }
+    .q-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:16px; }
+    .q-num { background:var(--primary); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; margin-top:1px; }
+    .q-num.done { background:var(--accent); }
+    .q-title { font-size:15px; font-weight:600; line-height:1.5; flex:1; }
+    .q-required { color:#DC2626; font-size:14px; margin-left:2px; }
+    .q-badge { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; margin-left:8px; vertical-align:middle; }
+    .q-badge.scoring { background:#FFF3E0; color:#E65100; border:1px solid #FFCC80; }
+    .q-badge.context { background:#F0F4FF; color:#3E33A3; border:1px solid #C5CAE9; }
+    .q-badge.core { background:#FCE4EC; color:#B71C1C; border:1px solid #EF9A9A; }
+    .q-info { font-size:13px; color:var(--text-muted); background:#F9FAFB; border:1px solid var(--border); border-radius:8px; padding:10px 14px; margin-bottom:14px; line-height:1.6; }
+    .q-info strong { color:var(--text); }
+
+    /* ── Options ── */
+    .options-list { display:flex; flex-direction:column; gap:8px; }
+    .option-item { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border:1.5px solid var(--border); border-radius:8px; cursor:pointer; transition:border-color 0.15s, background 0.15s; user-select:none; }
+    .option-item:hover { border-color:var(--primary); background:var(--primary-light); }
+    .option-item.selected { border-color:var(--primary); background:var(--primary-light); }
+    .option-item input { width:16px; height:16px; accent-color:var(--primary); flex-shrink:0; margin-top:2px; cursor:pointer; }
+    .option-label { font-size:14px; line-height:1.5; }
+    .tools-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:8px; }
+    .tools-grid .option-item { align-items:center; }
+
+    /* ── Textarea ── */
+    .q-textarea { width:100%; min-height:130px; border:1.5px solid var(--border); border-radius:8px; padding:12px 14px; font-family:inherit; font-size:14px; color:var(--text); line-height:1.6; resize:vertical; transition:border-color 0.15s; outline:none; }
+    .q-textarea:focus { border-color:var(--primary); }
+
+    /* ── Buttons ── */
+    .submit-wrap { text-align:center; margin-top:32px; }
+    .btn-submit { background:var(--primary); color:white; border:none; border-radius:8px; padding:14px 40px; font-size:16px; font-weight:600; cursor:pointer; transition:background 0.2s, transform 0.1s; box-shadow:0 4px 14px rgba(91,79,207,0.3); }
+    .btn-submit:hover { background:var(--primary-dark); transform:translateY(-1px); }
+    .btn-reset { background:transparent; color:var(--text-muted); border:1.5px solid var(--border); border-radius:8px; padding:13px 28px; font-size:14px; font-weight:500; cursor:pointer; margin-left:12px; transition:border-color 0.2s,color 0.2s; }
+    .btn-reset:hover { border-color:var(--primary); color:var(--primary); }
+
+    /* ── Results Panel ── */
+    #results-panel { display:none; margin-top:40px; }
+    #results-panel.visible { display:block; }
+
+    .maturity-hero { border-radius:var(--radius); padding:32px 28px; margin-bottom:24px; text-align:center; color:white; position:relative; overflow:hidden; }
+    .maturity-hero.level-1 { background:linear-gradient(135deg,#757575,#9E9E9E); }
+    .maturity-hero.level-2 { background:linear-gradient(135deg,#1565C0,#1976D2); }
+    .maturity-hero.level-3 { background:linear-gradient(135deg,#E65100,#F57C00); }
+    .maturity-hero.incomplete { background:linear-gradient(135deg,#424242,#616161); }
+    .maturity-level-label { font-size:13px; font-weight:600; opacity:0.8; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+    .maturity-level-title { font-size:36px; font-weight:800; margin-bottom:8px; }
+    .maturity-level-desc { font-size:15px; opacity:0.9; max-width:500px; margin:0 auto; line-height:1.5; }
+
+    /* ── Criteria table ── */
+    .criteria-panel { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px; margin-bottom:24px; box-shadow:var(--shadow); }
+    .criteria-panel h3 { font-size:16px; font-weight:700; margin-bottom:6px; }
+    .criteria-panel p { font-size:13px; color:var(--text-muted); margin-bottom:18px; }
+    .criteria-grid { display:flex; flex-direction:column; gap:0; }
+    .criterion-row { display:flex; align-items:flex-start; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); }
+    .criterion-row:last-child { border-bottom:none; }
+    .criterion-icon { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:15px; margin-top:1px; }
+    .criterion-icon.met3 { background:#E8F5E9; color:#2E7D32; }
+    .criterion-icon.met2 { background:#E3F2FD; color:#1565C0; }
+    .criterion-icon.partial { background:#FFF8E1; color:#F9A825; }
+    .criterion-icon.not-met { background:#FFEBEE; color:#C62828; }
+    .criterion-icon.unanswered { background:#F5F5F5; color:#9E9E9E; }
+    .criterion-body { flex:1; }
+    .criterion-name { font-size:14px; font-weight:600; color:var(--text); margin-bottom:3px; display:flex; align-items:center; gap:8px; }
+    .core-pill { background:#FCE4EC; color:#B71C1C; font-size:11px; font-weight:600; padding:1px 7px; border-radius:10px; }
+    .criterion-answer { font-size:13px; color:var(--text-muted); margin-bottom:4px; }
+    .criterion-status { font-size:12px; font-weight:600; }
+    .status-3 { color:#2E7D32; }
+    .status-2 { color:#1565C0; }
+    .status-partial { color:#F9A825; }
+    .status-0 { color:#C62828; }
+
+    /* ── Summary table ── */
+    .summary-panel { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); }
+    .summary-panel h3 { font-size:16px; font-weight:700; margin-bottom:4px; }
+    .summary-panel p { font-size:13px; color:var(--text-muted); margin-bottom:18px; }
+    .summary-row { padding:12px 0; border-bottom:1px solid var(--border); }
+    .summary-row:last-child { border-bottom:none; }
+    .summary-q { font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:4px; }
+    .summary-a { font-size:14px; color:var(--text); line-height:1.5; }
+    .tag { display:inline-block; background:var(--primary-light); color:var(--primary-dark); border-radius:5px; padding:2px 8px; font-size:12px; font-weight:500; margin:2px 2px 2px 0; }
+    .unanswered-note { color:#9E9E9E; font-style:italic; font-size:13px; }
+
+    /* ── Roadmap ── */
+    .roadmap-panel { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px; margin-bottom:24px; box-shadow:var(--shadow); }
+    .roadmap-panel > h3 { font-size:16px; font-weight:700; margin-bottom:4px; }
+    .roadmap-panel > p { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+    .roadmap-phases { display:flex; flex-direction:column; gap:24px; }
+    .phase-block {}
+    .phase-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .phase-num { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; flex-shrink:0; color:white; }
+    .phase-num.p1 { background:#1A237E; }
+    .phase-num.p2 { background:#1565C0; }
+    .phase-num.p3 { background:#0277BD; }
+    .phase-num.p4 { background:#E65100; }
+    .phase-title-wrap {}
+    .phase-title { font-size:15px; font-weight:700; color:var(--text); line-height:1.2; }
+    .phase-timeline { font-size:12px; color:var(--text-muted); margin-top:1px; }
+    .phase-actions { display:flex; flex-direction:column; gap:10px; padding-left:48px; }
+    .action-card { border:1px solid var(--border); border-radius:8px; padding:14px 16px; background:#FAFBFF; position:relative; }
+    .action-card.goal-l2 { border-left:3px solid #1565C0; }
+    .action-card.goal-l3 { border-left:3px solid #E65100; }
+    .action-card.blocker { border-left:3px solid #C62828; background:#FFF5F5; }
+    .action-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+    .action-criterion-tag { font-size:11px; font-weight:700; background:#E8EAF6; color:#3949AB; border-radius:4px; padding:2px 7px; text-transform:uppercase; letter-spacing:0.4px; }
+    .action-criterion-tag.blocker-tag { background:#FFEBEE; color:#B71C1C; }
+    .action-goal-badge { font-size:11px; font-weight:700; border-radius:4px; padding:2px 7px; }
+    .action-goal-badge.l2 { background:#E3F2FD; color:#1565C0; }
+    .action-goal-badge.l3 { background:#FBE9E7; color:#E65100; }
+    .action-effort { font-size:11px; border-radius:4px; padding:2px 7px; font-weight:600; }
+    .action-effort.low { background:#E8F5E9; color:#2E7D32; }
+    .action-effort.medium { background:#FFF8E1; color:#F57F17; }
+    .action-effort.high { background:#FCE4EC; color:#880E4F; }
+    .action-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px; }
+    .action-desc { font-size:13px; color:var(--text-muted); line-height:1.6; }
+    .roadmap-empty { text-align:center; padding:24px; color:var(--text-muted); font-size:14px; }
+
+    /* ── Legend ── */
+    .legend { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+    .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); }
+    .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+    /* ── Evidence / Verification toggle ── */
+    .evidence-toggle {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:12px; font-weight:600; color:#7C6F2E;
+      background:#FFFDE7; border:1px solid #FDD835;
+      border-radius:6px; padding:5px 12px;
+      cursor:pointer; margin-bottom:12px;
+      user-select:none; transition:background 0.15s;
+    }
+    .evidence-toggle:hover { background:#FFF9C4; }
+    .evidence-toggle .arrow { transition:transform 0.2s; display:inline-block; }
+    .evidence-toggle.open .arrow { transform:rotate(90deg); }
+    .evidence-box {
+      display:none;
+      background:#FFFDE7; border:1px solid #FDD835;
+      border-radius:8px; padding:14px 16px;
+      margin-bottom:14px; font-size:13px; color:#5D4037;
+      line-height:1.65;
+    }
+    .evidence-box.visible { display:block; }
+    .evidence-box strong { color:#3E2723; }
+    .evidence-box ul { padding-left:18px; margin-top:6px; }
+    .evidence-box ul li { margin-bottom:4px; }
+    .evidence-box .ev-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; }
+    .evidence-box .ev-table th { background:#FFF9C4; padding:6px 10px; text-align:left; border:1px solid #FDD835; font-weight:700; color:#3E2723; }
+    .evidence-box .ev-table td { padding:6px 10px; border:1px solid #FDD835; color:#5D4037; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-badge">AI Maturity Framework</div>
+    <h1>AI SDLC Maturity Assessment</h1>
+    <p>Evaluate how effectively your project leverages AI across the software development lifecycle.</p>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <div class="progress-label">
+      <span id="progress-text">0 of 12 answered</span>
+      <span id="progress-pct">0%</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Q1 context -->
+  <div class="q-card" id="card-1">
+    <div class="q-header">
+      <div class="q-num" id="num-1">1</div>
+      <div class="q-title">Does your project have formal approval for Generative AI usage in the MSA and SoW?<span class="q-required">*</span> <span class="q-badge context">Context</span></div>
+    </div>
+    <div class="options-list" id="opts-1">
+      <label class="option-item"><input type="radio" name="q1" value="prohibited"><span class="option-label">No — client explicitly prohibits GenAI usage in the MSA, SoWs.</span></label>
+      <label class="option-item"><input type="radio" name="q1" value="no_approval"><span class="option-label">No — approvals for GenAI usage have not been obtained in the MSA, SoWs.</span></label>
+      <label class="option-item"><input type="radio" name="q1" value="written_approval"><span class="option-label">No, however we have written approval from the client for GenAI usage.</span></label>
+      <label class="option-item"><input type="radio" name="q1" value="restricted"><span class="option-label">Yes, GenAI usage is approved in the MSA, SoW <strong>with restrictions</strong> (e.g. specific AI tools or particular restrictions).</span></label>
+      <label class="option-item"><input type="radio" name="q1" value="widely"><span class="option-label">Yes, AI usage is approved in the MSA, SoWs <strong>widely</strong> (e.g. different tools at EPAM's discretion).</span></label>
+      <label class="option-item"><input type="radio" name="q1" value="unknown"><span class="option-label">I don't know; I need help to find it out.</span></label>
+    </div>
+  </div>
+
+  <!-- Q2 context -->
+  <div class="q-card" id="card-2">
+    <div class="q-header">
+      <div class="q-num" id="num-2">2</div>
+      <div class="q-title">Are you using AI for SDLC on your project? <span class="q-badge context">Context</span></div>
+    </div>
+    <div class="options-list" id="opts-2">
+      <label class="option-item"><input type="radio" name="q2" value="using"><span class="option-label">Using AI for SDLC</span></label>
+      <label class="option-item"><input type="radio" name="q2" value="discussion"><span class="option-label">Under discussion / elaboration with client</span></label>
+      <label class="option-item"><input type="radio" name="q2" value="not_using"><span class="option-label">Not using AI</span></label>
+    </div>
+  </div>
+
+  <!-- Q3 scoring: DAU -->
+  <div class="q-card" id="card-3">
+    <div class="q-header">
+      <div class="q-num" id="num-3">3</div>
+      <div class="q-title">Please specify daily active usage — person has at least one interaction with AI tool per day (DAU) <span class="q-badge scoring">Scoring</span></div>
+    </div>
+    <div class="q-info"><strong>Supporting info:</strong> Measure DAU via telemetry (GitHub, Azure Monitor, etc.) or regular surveys. Applies regardless of which side (EPAM or client) owns related tools.</div>
+    <div class="evidence-toggle" onclick="toggleEvidence('ev-3')"><span class="arrow">▶</span> Evidence &amp; Verification Required</div>
+    <div class="evidence-box" id="ev-3">
+      <strong>How this answer is verified:</strong> Provide a screenshot of telemetry from the AI tool(s) used (e.g. GitHub Copilot metrics, Azure Monitor) <em>or</em> a screenshot of the latest team survey results showing DAU data. In case of mixed measurement (some tools provide telemetry, others do not), multiple screenshots may be required.
+      <ul>
+        <li>The numbers needed to calculate the DAU % must be <strong>clearly visible</strong> and logically understandable.</li>
+        <li>The screenshot should be self-explanatory — it should be clear which team/project it belongs to and what the time period covers.</li>
+        <li>Assessors will compare the DAU % derived from the screenshot with the selected answer.</li>
+      </ul>
+    </div>
+    <div class="options-list" id="opts-3">
+      <label class="option-item"><input type="radio" name="q3" value="80plus"><span class="option-label">DAU is <strong>more than 80%</strong></span></label>
+      <label class="option-item"><input type="radio" name="q3" value="70-80"><span class="option-label">DAU is <strong>70%–80%</strong></span></label>
+      <label class="option-item"><input type="radio" name="q3" value="50-69"><span class="option-label">DAU is <strong>50%–69%</strong></span></label>
+      <label class="option-item"><input type="radio" name="q3" value="30-49"><span class="option-label">DAU is <strong>30%–49%</strong></span></label>
+      <label class="option-item"><input type="radio" name="q3" value="sub30"><span class="option-label">DAU is <strong>less than 30%</strong></span></label>
+      <label class="option-item"><input type="radio" name="q3" value="not_measured"><span class="option-label">Not measured</span></label>
+    </div>
+  </div>
+
+  <!-- Q4 scoring: metrics -->
+  <div class="q-card" id="card-4">
+    <div class="q-header">
+      <div class="q-num" id="num-4">4</div>
+      <div class="q-title">Select the most applicable option regarding productivity metrics tracking <span class="q-badge scoring">Scoring</span></div>
+    </div>
+    <div class="q-info">
+      <strong>Throughput:</strong> velocity, number of tasks delivered.<br>
+      <strong>Cycle time:</strong> time in status, flow time, actual duration.<br>
+      <strong>Quality:</strong> defect containment rate, issues reported per release.
+    </div>
+    <div class="evidence-toggle" onclick="toggleEvidence('ev-4')"><span class="arrow">▶</span> Evidence &amp; Verification Required</div>
+    <div class="evidence-box" id="ev-4">
+      <strong>How this answer is verified:</strong> Provide a screenshot of the metrics report from the relevant tool (Jira, Azure DevOps, etc.) <em>or</em> a screenshot from a survey capturing these metrics. You may also reference the Metrics section in your Delivery Center.
+      <ul>
+        <li>The <strong>names of the tracked metrics</strong> must be clearly visible. Assessors care about the fact that metrics exist, not the specific values.</li>
+        <li>The screenshot should make it clear which metrics dimension(s) are being tracked: throughput, cycle time, and/or quality.</li>
+        <li>Assessors will compare the screenshot content against your selected answer.</li>
+      </ul>
+    </div>
+    <div class="options-list" id="opts-4">
+      <label class="option-item"><input type="radio" name="q4" value="all_three"><span class="option-label">I track cycle time <strong>AND</strong> throughput <strong>AND</strong> quality</span></label>
+      <label class="option-item"><input type="radio" name="q4" value="partial"><span class="option-label">I track productivity partially: cycle time <strong>OR</strong> throughput <strong>OR</strong> quality</span></label>
+      <label class="option-item"><input type="radio" name="q4" value="none"><span class="option-label">I do not track any productivity metrics mentioned above</span></label>
+    </div>
+  </div>
+
+  <!-- Q5 context -->
+  <div class="q-card" id="card-5">
+    <div class="q-header">
+      <div class="q-num" id="num-5">5</div>
+      <div class="q-title">What approach do you use to track productivity metrics? <span class="q-badge context">Context</span></div>
+    </div>
+    <div class="options-list" id="opts-5">
+      <label class="option-item"><input type="radio" name="q5" value="automated"><span class="option-label">Automated (Jira, Azure DevOps, GitHub)</span></label>
+      <label class="option-item"><input type="radio" name="q5" value="surveys"><span class="option-label">Surveys</span></label>
+      <label class="option-item"><input type="radio" name="q5" value="mixed"><span class="option-label">Mixed (both automated and surveys)</span></label>
+      <label class="option-item"><input type="radio" name="q5" value="other"><span class="option-label">Other</span></label>
+    </div>
+  </div>
+
+  <!-- Q6 scoring: champions -->
+  <div class="q-card" id="card-6">
+    <div class="q-header">
+      <div class="q-num" id="num-6">6</div>
+      <div class="q-title">Please select the most applicable option regarding AI Champions presence <span class="q-badge scoring">Scoring</span></div>
+    </div>
+    <div class="q-info"><strong>Core roles</strong> represent positions that collectively account for over 80% of project team members.</div>
+    <div class="evidence-toggle" onclick="toggleEvidence('ev-6')"><span class="arrow">▶</span> Evidence &amp; Verification Required</div>
+    <div class="evidence-box" id="ev-6">
+      <strong>How this answer is verified:</strong> Provide information about each AI Champion following the template below. Fill this in for Question 7 below.
+      <table class="ev-table">
+        <tr><th>Role</th><th>AI Champion Name(s)</th><th>AI Champion Activities</th></tr>
+        <tr><td>e.g. QA</td><td></td><td></td></tr>
+        <tr><td>e.g. Developer</td><td></td><td></td></tr>
+        <tr><td>e.g. BA / PM</td><td></td><td></td></tr>
+      </table>
+      <ul style="margin-top:10px;">
+        <li>List <strong>all core roles</strong> on the project and map each to their champion.</li>
+        <li>Describe concrete AI activities performed for each role (e.g. maintaining prompt library, running workshops, reviewing AI outputs).</li>
+      </ul>
+    </div>
+    <div class="options-list" id="opts-6">
+      <label class="option-item"><input type="radio" name="q6" value="all_roles"><span class="option-label">I have AI Champions for <strong>all core roles</strong> on my project</span></label>
+      <label class="option-item"><input type="radio" name="q6" value="one"><span class="option-label">I have <strong>one AI Champion</strong></span></label>
+      <label class="option-item"><input type="radio" name="q6" value="none"><span class="option-label">There are <strong>no AI Champions</strong> on my project</span></label>
+    </div>
+  </div>
+
+  <!-- Q7 context -->
+  <div class="q-card" id="card-7">
+    <div class="q-header">
+      <div class="q-num" id="num-7">7</div>
+      <div class="q-title">For each AI Champion, specify role(s) covered and AI-related activities performed<span class="q-required">*</span> <span class="q-badge context">Context</span></div>
+    </div>
+    <textarea class="q-textarea" id="q7-text" placeholder="e.g. John Smith — covers backend developers and QA. Activities: maintains shared prompt library, runs bi-weekly AI tooling workshops, reviews AI-generated code quality...">Yevgeniy Gavrilov — covers delivery manager, project manager and scrum master duties. Activities: organized daily PoC progress sessions with core team, weekly demo with key stakeholders, weekly working session with the team. Contributes to the CUAS Developer Plugin by creating new agents and skills, improving solution architecture. Adopted Anthropic distribution model for the agentic solution and refactored it to leverage that model. PoC that was a combination of agents and skills is now a plugin distributed to the whole team and is available for anyone in TR. Strong advocate and SME on AI tools and specifically Claude Code.</textarea>
+  </div>
+
+  <!-- Q8 scoring: reusability -->
+  <div class="q-card" id="card-8">
+    <div class="q-header">
+      <div class="q-num" id="num-8">8</div>
+      <div class="q-title">How do you ensure the reusability of AI artifacts on your project? <span class="q-badge scoring">Scoring</span></div>
+    </div>
+    <div class="q-info">A <strong>sharable artefact</strong> is any reusable AI-related asset — prompts, rules, workflows, agents as code, instruction files, skill files — that helps teams apply GenAI tools consistently.</div>
+    <div class="evidence-toggle" onclick="toggleEvidence('ev-8')"><span class="arrow">▶</span> Evidence &amp; Verification Required</div>
+    <div class="evidence-box" id="ev-8">
+      <strong>How this answer is verified:</strong> Provide screenshot(s) from the source(s) where AI artifacts are stored — e.g. Confluence, SharePoint, or a source control tool (GitHub, Bitbucket).
+      <ul>
+        <li>The <strong>names of the artifacts</strong> must be clearly visible, logically understandable, and self-explanatory.</li>
+        <li>Ideally the <strong>date of the latest update</strong> is also captured in the screenshot.</li>
+        <li>If you selected the "codified as code" option, screenshots from your <strong>source control tool are mandatory</strong>. Also provide links to the actual artifacts where possible.</li>
+        <li>Assessors will compare the screenshot content against your selected answer.</li>
+      </ul>
+    </div>
+    <div class="options-list" id="opts-8">
+      <label class="option-item"><input type="radio" name="q8" value="codified"><span class="option-label">Rules and custom agents are <strong>codified and managed as code</strong> (versioned, reviewed, stored in repositories), with automated or semi-automated continuous improvement loops.</span></label>
+      <label class="option-item"><input type="radio" name="q8" value="onboarding"><span class="option-label">Onboarding materials are updated and include <strong>shared prompts, rules, context, and custom agents</strong> reused consistently across the team.</span></label>
+      <label class="option-item"><input type="radio" name="q8" value="none"><span class="option-label">I have none of the above</span></label>
+    </div>
+  </div>
+
+  <!-- Q9 CORE scoring: deliverables -->
+  <div class="q-card" id="card-9">
+    <div class="q-header">
+      <div class="q-num" id="num-9">9</div>
+      <div class="q-title">Approximately what percentage of your deliverables/tasks are created or meaningfully assisted by AI tools? <span class="q-badge core">Core Criterion</span></div>
+    </div>
+    <div class="q-info">Review primary outputs for each core role (e.g. BA: user stories; QA: test cases; Dev: code) and estimate what portion were significantly accelerated using AI across all core roles.</div>
+    <div class="evidence-toggle" onclick="toggleEvidence('ev-9')"><span class="arrow">▶</span> Evidence &amp; Verification Required</div>
+    <div class="evidence-box" id="ev-9">
+      <strong>How this answer is verified:</strong> Since this % involves estimation, assessors primarily evaluate <em>how</em> the number was calculated, not just the number itself.
+      <ul>
+        <li>Provide a <strong>brief written explanation</strong> of how the % was derived — which roles were considered, what their primary deliverables are, and what share was AI-assisted.</li>
+        <li>If your project uses an "AI-assisted" tag or label in Jira or similar tools, <strong>screenshots of relevant reports</strong> are very helpful and strongly recommended.</li>
+        <li>Any supporting evidence (velocity dashboards, AI usage logs, team surveys) strengthens the assessment.</li>
+        <li>Add your explanation in the AI Champions text field (Q7) or as a comment when submitting.</li>
+      </ul>
+    </div>
+    <div class="options-list" id="opts-9">
+      <label class="option-item"><input type="radio" name="q9" value="75plus"><span class="option-label"><strong>75% or more</strong></span></label>
+      <label class="option-item"><input type="radio" name="q9" value="50-74"><span class="option-label"><strong>50% to 74%</strong></span></label>
+      <label class="option-item"><input type="radio" name="q9" value="25-49"><span class="option-label"><strong>25% to 49%</strong></span></label>
+      <label class="option-item"><input type="radio" name="q9" value="sub25"><span class="option-label"><strong>Less than 25%</strong></span></label>
+      <label class="option-item"><input type="radio" name="q9" value="setting_up"><span class="option-label">AI usage is in process of setting up</span></label>
+    </div>
+  </div>
+
+  <!-- Q10 scoring: cost -->
+  <div class="q-card" id="card-10">
+    <div class="q-header">
+      <div class="q-num" id="num-10">10</div>
+      <div class="q-title">How do you track and manage the cost associated with AI usage on your project? <span class="q-badge scoring">Scoring</span></div>
+    </div>
+    <div class="evidence-toggle" onclick="toggleEvidence('ev-10')"><span class="arrow">▶</span> Evidence &amp; Verification Required</div>
+    <div class="evidence-box" id="ev-10">
+      <strong>How this answer is verified:</strong> Cost tracking evidence is primarily required for <strong>Level 3</strong> projects, where active optimization is expected.
+      <ul>
+        <li>Provide <strong>screenshots from AI tools or cost analytics systems</strong> (e.g. license dashboards, Azure cost management, inference usage reports) showing AI-related spend.</li>
+        <li>Include a brief <strong>explanation of what is being reviewed</strong> and what optimization actions have been taken or are planned.</li>
+        <li>The artifact names and cost figures should be clearly visible and self-explanatory.</li>
+        <li>If cost data is owned by the client and not accessible, note this — it will be taken into account during assessment.</li>
+      </ul>
+    </div>
+    <div class="options-list" id="opts-10">
+      <label class="option-item"><input type="radio" name="q10" value="visibility_reviews"><span class="option-label">I have visibility into AI costs (licenses, inference) and conduct <strong>regular reviews</strong> to drive optimizations and improve output vs cost.</span></label>
+      <label class="option-item"><input type="radio" name="q10" value="visibility_only"><span class="option-label">I have visibility into AI costs (licenses, inference), but do <strong>NOT</strong> conduct regular reviews for optimization.</span></label>
+      <label class="option-item"><input type="radio" name="q10" value="no_visibility"><span class="option-label">I do <strong>NOT</strong> have visibility into AI costs because this information is owned and restricted by the client.</span></label>
+    </div>
+  </div>
+
+  <!-- Q11 CORE Level 3 scoring: Novel vs Commodity -->
+  <div class="q-card" id="card-11">
+    <div class="q-header">
+      <div class="q-num" id="num-11">11</div>
+      <div class="q-title">What tools/features/ways of working do you use to create deliverables across roles? <span class="q-badge core">Core Criterion (Level 3)</span></div>
+    </div>
+    <div class="q-info">
+      <strong>Commodity Tools:</strong> widely adopted, standardized tools — chatbots, simple agents, code review, MCP integration, performance analysis.<br><br>
+      <strong>Novel Tools:</strong> innovative or experimental — on-prem deployment, complex multi-agent orchestration, spec-driven approaches, automated scenario execution, defect management.
+    </div>
+    <div class="evidence-toggle" onclick="toggleEvidence('ev-11')"><span class="arrow">▶</span> Evidence &amp; Verification Required</div>
+    <div class="evidence-box" id="ev-11">
+      <strong>How this answer is verified:</strong> Evidence of tool usage is primarily important for <strong>Novel tools</strong> (required for Level 3). For Commodity tools at Level 2, evidence is helpful but not strictly mandatory.
+      <ul>
+        <li>Provide <strong>screenshots from source control tools or code repositories</strong> (GitHub, Bitbucket, etc.) showing Novel tool usage — e.g. multi-agent workflow code, spec-driven scripts, automated pipelines.</li>
+        <li>The artifact names should be clearly visible, logically understandable, and self-explanatory.</li>
+        <li>Add brief explanations in comments describing <em>how</em> the novel approach is being used and which roles it serves.</li>
+        <li>For Level 3 assessment, this evidence is <strong>crucial</strong> — the assessor will verify that Novel tools are genuinely embedded in core workflows.</li>
+      </ul>
+    </div>
+    <div class="options-list" id="opts-11">
+      <label class="option-item"><input type="radio" name="q11" value="novel"><span class="option-label">We mostly use <strong>Novel AI Tools</strong></span></label>
+      <label class="option-item"><input type="radio" name="q11" value="commodity"><span class="option-label">We mostly use <strong>Commodity AI Tools</strong></span></label>
+    </div>
+  </div>
+
+  <!-- Q12 scoring: tools -->
+  <div class="q-card" id="card-12">
+    <div class="q-header">
+      <div class="q-num" id="num-12">12</div>
+      <div class="q-title">Which AI-powered tools do you use to boost productivity? <em style="font-weight:400;color:var(--text-muted);font-size:13px;">(select all that apply)</em> <span class="q-badge scoring">Scoring</span></div>
+    </div>
+    <div class="tools-grid" id="opts-12">
+      <label class="option-item"><input type="checkbox" name="q12" value="elitea"><span class="option-label">EPAM EliteA</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="codemie"><span class="option-label">EPAM CodeMie</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="dial"><span class="option-label">EPAM DIAL</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="github_copilot"><span class="option-label">GitHub Copilot</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="amazonq"><span class="option-label">Amazon Q Developer</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="gemini"><span class="option-label">Gemini Code Assist</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="ms_copilot"><span class="option-label">MS Copilot</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="cursor"><span class="option-label">Cursor</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="sourcegraph"><span class="option-label">Sourcegraph / Amp</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="windsurf"><span class="option-label">Windsurf</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="kiro"><span class="option-label">Kiro</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="claude"><span class="option-label">Claude.ai / Claude Code</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="custom_client"><span class="option-label">Custom Client's AI tools</span></label>
+      <label class="option-item"><input type="checkbox" name="q12" value="other_tools"><span class="option-label">Other</span></label>
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-wrap">
+    <button class="btn-submit" onclick="submitForm()">Calculate Maturity Level →</button>
+    <button class="btn-reset" onclick="resetForm()">Reset All</button>
+  </div>
+
+  <!-- Results -->
+  <div id="results-panel">
+
+    <!-- Maturity hero -->
+    <div class="maturity-hero" id="maturity-hero">
+      <div class="maturity-level-label" id="hero-label">—</div>
+      <div class="maturity-level-title" id="hero-title">—</div>
+      <div class="maturity-level-desc" id="hero-desc">—</div>
+    </div>
+
+    <!-- Scoring criteria breakdown -->
+    <div class="criteria-panel">
+      <h3>Scoring Criteria Breakdown</h3>
+      <p>All criteria must be met at a given level to advance. Each row shows your current answer and whether it meets Level 2 or Level 3 thresholds.</p>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#2E7D32"></div> Meets Level 3</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1565C0"></div> Meets Level 2</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F9A825"></div> Partially meets Level 2</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#C62828"></div> Does not meet Level 2</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#9E9E9E"></div> Not answered</div>
+      </div>
+      <div class="criteria-grid" id="criteria-grid"></div>
+    </div>
+
+    <!-- Improvement Roadmap -->
+    <div class="roadmap-panel">
+      <h3>📍 Your Improvement Roadmap</h3>
+      <p>Personalized action plan based on your gaps. Phases are sequenced by dependency — complete earlier phases before moving on.</p>
+      <div class="roadmap-phases" id="roadmap-phases"></div>
+    </div>
+
+    <!-- Context summary -->
+    <div class="summary-panel">
+      <h3>Full Response Summary</h3>
+      <p>All answers including context questions</p>
+      <div id="summary-content"></div>
+    </div>
+
+  </div><!-- /results-panel -->
+
+</div><!-- /main -->
+
+<script>
+const Q_LABELS = {
+  q1: { prohibited:"No — client explicitly prohibits GenAI usage", no_approval:"No — approvals not obtained", written_approval:"No, but written client approval obtained", restricted:"Yes — approved with restrictions", widely:"Yes — approved widely", unknown:"Don't know" },
+  q2: { using:"Using AI for SDLC", discussion:"Under discussion / elaboration with client", not_using:"Not using AI" },
+  q3: { "80plus":"DAU > 80%", "70-80":"DAU 70%–80%", "50-69":"DAU 50%–69%", "30-49":"DAU 30%–49%", "sub30":"DAU < 30%", "not_measured":"Not measured" },
+  q4: { all_three:"Tracking cycle time AND throughput AND quality", partial:"Tracking partially (one or two)", none:"Not tracking any" },
+  q5: { automated:"Automated (Jira, Azure DevOps, GitHub)", surveys:"Surveys", mixed:"Mixed (automated + surveys)", other:"Other" },
+  q6: { all_roles:"AI Champions for all core roles", one:"One AI Champion", none:"No AI Champions" },
+  q8: { codified:"Codified as code with CI loops", onboarding:"Onboarding materials with shared prompts/agents", none:"None of the above" },
+  q9: { "75plus":"75% or more", "50-74":"50%–74%", "25-49":"25%–49%", "sub25":"Less than 25%", "setting_up":"Setting up" },
+  q10: { visibility_reviews:"Visibility + regular reviews", visibility_only:"Visibility, but no regular reviews", no_visibility:"No visibility (client-owned)" },
+  q11: { novel:"Mostly Novel AI Tools", commodity:"Mostly Commodity AI Tools" },
+  q12: { elitea:"EPAM EliteA", codemie:"EPAM CodeMie", dial:"EPAM DIAL", github_copilot:"GitHub Copilot", amazonq:"Amazon Q Developer", gemini:"Gemini Code Assist", ms_copilot:"MS Copilot", cursor:"Cursor", sourcegraph:"Sourcegraph / Amp", windsurf:"Windsurf", kiro:"Kiro", claude:"Claude.ai / Claude Code", custom_client:"Custom Client AI tools", other_tools:"Other" }
+};
+
+const QUESTIONS = [
+  {id:1,name:"q1",type:"radio",title:"Formal GenAI approval in MSA/SoW",scoring:false},
+  {id:2,name:"q2",type:"radio",title:"Using AI for SDLC",scoring:false},
+  {id:3,name:"q3",type:"radio",title:"Daily Active Usage (DAU)",scoring:true},
+  {id:4,name:"q4",type:"radio",title:"Productivity metrics tracking",scoring:true},
+  {id:5,name:"q5",type:"radio",title:"Approach to tracking metrics",scoring:false},
+  {id:6,name:"q6",type:"radio",title:"AI Champions presence",scoring:true},
+  {id:7,name:"q7",type:"textarea",title:"AI Champion roles & activities",scoring:false},
+  {id:8,name:"q8",type:"radio",title:"Reusability of AI artifacts",scoring:true},
+  {id:9,name:"q9",type:"radio",title:"AI-assisted deliverables %",scoring:true,core:true},
+  {id:10,name:"q10",type:"radio",title:"AI cost tracking",scoring:true},
+  {id:11,name:"q11",type:"radio",title:"Novel vs Commodity AI tools",scoring:true,core:"level3"},
+  {id:12,name:"q12",type:"checkbox",title:"AI tools in use",scoring:true},
+];
+
+// ── Helpers ──
+function getVal(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+function getCheckboxVals(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(e => e.value);
+}
+function getTextarea() { return document.getElementById('q7-text').value.trim(); }
+
+// ── Scoring functions ── returns: "level3" | "level2" | "partial" | "none" | "unanswered"
+function scoreDAU(v) {
+  if (!v) return "unanswered";
+  if (v==="80plus"||v==="70-80") return "level3";
+  if (v==="50-69") return "level2";
+  if (v==="30-49") return "partial";
+  return "none"; // sub30, not_measured
+}
+function scoreMetrics(v) {
+  if (!v) return "unanswered";
+  if (v==="all_three") return "level3";
+  if (v==="partial") return "level2";
+  return "none";
+}
+function scoreCost(v) {
+  if (!v) return "unanswered";
+  if (v==="visibility_reviews") return "level3";
+  if (v==="visibility_only") return "level2";
+  return "partial"; // no_visibility — client restricts, partial credit
+}
+function scoreChampions(v) {
+  if (!v) return "unanswered";
+  if (v==="all_roles") return "level3";
+  if (v==="one") return "level2";
+  return "none";
+}
+function scoreReusability(v) {
+  if (!v) return "unanswered";
+  if (v==="codified") return "level3";
+  if (v==="onboarding") return "level2";
+  return "none";
+}
+function scoreDeliverables(v) {
+  if (!v) return "unanswered";
+  if (v==="75plus") return "level3";
+  if (v==="50-74") return "level2";
+  if (v==="25-49") return "partial";
+  return "none";
+}
+function scoreNovel(v) {
+  if (!v) return "unanswered";
+  if (v==="novel") return "level3";
+  return "level2"; // commodity still counts for level2
+}
+function scoreTools(vals) {
+  if (!vals || vals.length===0) return "unanswered";
+  if (vals.length>=3) return "level3";
+  if (vals.length>=1) return "level2";
+  return "none";
+}
+
+const STATUS_ORDER = { level3:4, level2:3, partial:2, none:1, unanswered:0 };
+function meetsLevel2(s) { return s==="level2"||s==="level3"; }
+function meetsLevel3(s) { return s==="level3"; }
+
+// ── Maturity calculation ──
+function calcMaturity() {
+  const q3=getVal("q3"), q4=getVal("q4"), q6=getVal("q6"), q8=getVal("q8"),
+        q9=getVal("q9"), q10=getVal("q10"), q11=getVal("q11"), q12=getCheckboxVals("q12");
+
+  const scores = {
+    dau: scoreDAU(q3),
+    metrics: scoreMetrics(q4),
+    cost: scoreCost(q10),
+    champions: scoreChampions(q6),
+    reusability: scoreReusability(q8),
+    deliverables: scoreDeliverables(q9),
+    novel: scoreNovel(q11),
+    tools: scoreTools(q12),
+  };
+
+  // Level 3: all criteria at level3, deliverables=level3, novel=level3
+  const level3 = meetsLevel3(scores.dau) && meetsLevel3(scores.metrics) && meetsLevel3(scores.cost) &&
+                 meetsLevel3(scores.champions) && meetsLevel3(scores.reusability) &&
+                 meetsLevel3(scores.deliverables) && meetsLevel3(scores.novel) && meetsLevel3(scores.tools);
+
+  // Level 2: deliverables ≥50% + all other criteria ≥ level2
+  const level2 = meetsLevel2(scores.deliverables) &&
+                 meetsLevel2(scores.dau) && meetsLevel2(scores.metrics) && meetsLevel2(scores.cost) &&
+                 meetsLevel2(scores.champions) && meetsLevel2(scores.reusability) && meetsLevel2(scores.tools);
+
+  const hasUnanswered = Object.values(scores).some(s=>s==="unanswered");
+  const level = level3 ? 3 : level2 ? 2 : 1;
+
+  return { scores, level, hasUnanswered };
+}
+
+// ── Render criteria grid ──
+function renderCriteria(scores) {
+  const CRITERIA = [
+    {
+      key:"deliverables", label:"AI-Assisted Deliverables", isCore:true, coreLabel:"Core Criterion for Level 2",
+      answer: Q_LABELS.q9[getVal("q9")] || "—",
+      l2:"≥ 50% of deliverables meaningfully assisted by AI", l3:"≥ 75% of deliverables meaningfully assisted by AI"
+    },
+    {
+      key:"dau", label:"Daily Active Usage (DAU)", isCore:false,
+      answer: Q_LABELS.q3[getVal("q3")] || "—",
+      l2:"DAU ≥ 50%", l3:"DAU ≥ 70%"
+    },
+    {
+      key:"metrics", label:"Performance Metrics Tracking", isCore:false,
+      answer: Q_LABELS.q4[getVal("q4")] || "—",
+      l2:"Track at least one metric type", l3:"Track cycle time AND throughput AND quality"
+    },
+    {
+      key:"cost", label:"AI Infrastructure Cost Tracking", isCore:false,
+      answer: Q_LABELS.q10[getVal("q10")] || "—",
+      l2:"Visibility into AI costs", l3:"Visibility + regular optimization reviews"
+    },
+    {
+      key:"champions", label:"AI Champions", isCore:false,
+      answer: Q_LABELS.q6[getVal("q6")] || "—",
+      l2:"At least one AI Champion", l3:"AI Champions for all core roles"
+    },
+    {
+      key:"reusability", label:"AI Artifacts Reusability", isCore:false,
+      answer: Q_LABELS.q8[getVal("q8")] || "—",
+      l2:"Onboarding materials with shared prompts/agents", l3:"Codified as code with continuous improvement loops"
+    },
+    {
+      key:"novel", label:"Novel vs Commodity AI Tools", isCore:true, coreLabel:"Core Criterion for Level 3",
+      answer: Q_LABELS.q11[getVal("q11")] || "—",
+      l2:"Using any AI tools (commodity or novel)", l3:"Mostly using Novel AI tools"
+    },
+    {
+      key:"tools", label:"AI Capabilities & Tools Adoption", isCore:false,
+      answer: (getCheckboxVals("q12").map(v=>Q_LABELS.q12[v]).join(", ")) || "—",
+      l2:"Using at least 1 AI tool", l3:"Using 3 or more distinct AI tools"
+    },
+  ];
+
+  const icons = {
+    level3: {cls:"met3", char:"✦"},
+    level2: {cls:"met2", char:"✓"},
+    partial:{cls:"partial", char:"◑"},
+    none:   {cls:"not-met", char:"✕"},
+    unanswered:{cls:"unanswered", char:"?"},
+  };
+  const statusText = {
+    level3:"Meets Level 3", level2:"Meets Level 2",
+    partial:"Partially meets Level 2", none:"Does not meet Level 2", unanswered:"Not answered"
+  };
+  const statusClass = {
+    level3:"status-3", level2:"status-2", partial:"status-partial", none:"status-0", unanswered:"status-0"
+  };
+
+  const grid = document.getElementById('criteria-grid');
+  grid.innerHTML = CRITERIA.map(c => {
+    const s = scores[c.key];
+    const ic = icons[s] || icons.unanswered;
+    return `
+      <div class="criterion-row">
+        <div class="criterion-icon ${ic.cls}">${ic.char}</div>
+        <div class="criterion-body">
+          <div class="criterion-name">
+            ${c.label}
+            ${c.isCore ? `<span class="core-pill">${c.coreLabel}</span>` : ''}
+          </div>
+          <div class="criterion-answer">Your answer: <em>${c.answer}</em></div>
+          <div class="criterion-answer" style="font-size:12px;margin-top:2px;">
+            Level 2 threshold: ${c.l2} &nbsp;·&nbsp; Level 3 threshold: ${c.l3}
+          </div>
+          <div class="criterion-status ${statusClass[s]}">${statusText[s] || "—"}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Render summary (all Qs) ──
+function renderSummary() {
+  const content = document.getElementById('summary-content');
+  let html = '';
+  QUESTIONS.forEach(q => {
+    html += `<div class="summary-row"><div class="summary-q">Q${q.id}. ${q.title}</div>`;
+    if (q.type==='radio') {
+      const v = getVal(q.name);
+      html += `<div class="summary-a">${v ? (Q_LABELS[q.name][v]||v) : '<span class="unanswered-note">— Not answered</span>'}</div>`;
+    } else if (q.type==='checkbox') {
+      const vals = getCheckboxVals(q.name);
+      html += `<div class="summary-a">${vals.length ? vals.map(v=>`<span class="tag">${Q_LABELS[q.name][v]||v}</span>`).join('') : '<span class="unanswered-note">— Not answered</span>'}</div>`;
+    } else {
+      const t = getTextarea();
+      html += `<div class="summary-a">${t || '<span class="unanswered-note">— Not answered</span>'}</div>`;
+    }
+    html += '</div>';
+  });
+  content.innerHTML = html;
+}
+
+// ── Submit ──
+function submitForm() {
+  const { scores, level, hasUnanswered } = calcMaturity();
+
+  const hero = document.getElementById('maturity-hero');
+  const heroLabel = document.getElementById('hero-label');
+  const heroTitle = document.getElementById('hero-title');
+  const heroDesc = document.getElementById('hero-desc');
+
+  hero.className = 'maturity-hero';
+
+  if (hasUnanswered) {
+    hero.classList.add('incomplete');
+    heroLabel.textContent = 'Incomplete — some scoring questions unanswered';
+    heroTitle.textContent = 'Estimated: Level ' + level;
+    heroDesc.textContent = 'Answer all scoring questions (marked orange) for a definitive result. The estimate above is based on answered questions only.';
+  } else if (level===3) {
+    hero.classList.add('level-3');
+    heroLabel.textContent = 'Maturity Assessment Result';
+    heroTitle.textContent = '🏆 Level 3 — AI-Native';
+    heroDesc.textContent = 'Your project has achieved the highest maturity level. Novel AI tools are embedded in core workflows and all scoring criteria are fully met.';
+  } else if (level===2) {
+    hero.classList.add('level-2');
+    heroLabel.textContent = 'Maturity Assessment Result';
+    heroTitle.textContent = '⚡ Level 2 — AI-Enabled';
+    heroDesc.textContent = 'Your project has reached Level 2. AI meaningfully assists 50%+ of deliverables and all foundational criteria are in place. Focus on novel tools and higher DAU to reach Level 3.';
+  } else {
+    hero.classList.add('level-1');
+    heroLabel.textContent = 'Maturity Assessment Result';
+    heroTitle.textContent = '🌱 Level 1 — AI-Exploring';
+    heroDesc.textContent = 'Your project is on the AI maturity journey. Review the criteria below to understand what is needed to advance to Level 2. The key focus is getting AI-assisted deliverables above 50%.';
+  }
+
+  renderCriteria(scores);
+
+  // Build answers object for roadmap
+  const answers = {
+    q1: getVal('q1'), q2: getVal('q2'), q3: getVal('q3'),
+    q4: getVal('q4'), q5: getVal('q5'), q6: getVal('q6'),
+    q8: getVal('q8'), q9: getVal('q9'), q10: getVal('q10'),
+    q11: getVal('q11'), q12: getCheckboxVals('q12'),
+  };
+  renderRoadmap(answers);
+
+  renderSummary();
+
+  const panel = document.getElementById('results-panel');
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── Reset ──
+function resetForm() {
+  if (!confirm('Reset all answers?')) return;
+  document.querySelectorAll('input[type="radio"],input[type="checkbox"]').forEach(i=>{
+    i.checked=false; i.closest('.option-item').classList.remove('selected');
+  });
+  document.getElementById('q7-text').value='';
+  QUESTIONS.forEach(q=>markCard(q.id,false));
+  document.getElementById('results-panel').classList.remove('visible');
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Progress & card marking ──
+function updateProgress() {
+  let count=0;
+  QUESTIONS.forEach(q=>{
+    if(q.type==='radio'&&getVal(q.name)) count++;
+    else if(q.type==='checkbox'&&getCheckboxVals(q.name).length>0) count++;
+    else if(q.type==='textarea'&&getTextarea().length>0) count++;
+  });
+  const pct=Math.round(count/12*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-text').textContent=count+' of 12 answered';
+  document.getElementById('progress-pct').textContent=pct+'%';
+}
+function markCard(n,done){
+  const card=document.getElementById('card-'+n), num=document.getElementById('num-'+n);
+  if(done){card.classList.add('answered');num.classList.add('done');num.innerHTML='✓';}
+  else{card.classList.remove('answered');num.classList.remove('done');num.textContent=n;}
+}
+
+// ── Attach listeners ──
+QUESTIONS.forEach(q=>{
+  if(q.type==='radio'){
+    document.querySelectorAll(`input[name="${q.name}"]`).forEach(inp=>{
+      inp.addEventListener('change',()=>{
+        document.querySelectorAll(`#opts-${q.id} .option-item`).forEach(li=>li.classList.remove('selected'));
+        inp.closest('.option-item').classList.add('selected');
+        markCard(q.id,true); updateProgress();
+      });
+    });
+  } else if(q.type==='checkbox'){
+    document.querySelectorAll(`input[name="${q.name}"]`).forEach(inp=>{
+      inp.addEventListener('change',()=>{
+        inp.closest('.option-item').classList.toggle('selected',inp.checked);
+        markCard(q.id,getCheckboxVals(q.name).length>0); updateProgress();
+      });
+    });
+  } else if(q.type==='textarea'){
+    document.getElementById('q7-text').addEventListener('input',()=>{
+      markCard(q.id,getTextarea().length>0); updateProgress();
+    });
+  }
+});
+
+// ════════════════════════════════════════════════
+// ROADMAP SCHEMA
+// Each item: { id, phase, criterion, criterionLabel, title, desc, effort, goal, condition(answers) }
+// condition returns true when this action is needed
+// phases: 1=Quick Wins, 2=Foundation, 3=Adoption, 4=Mastery/L3
+// ════════════════════════════════════════════════
+const ROADMAP_ITEMS = [
+
+  // ── BLOCKER: Approval ──────────────────────────────────────────
+  {
+    id: 'approval_get',
+    phase: 1,
+    criterion: 'GenAI Approval',
+    criterionLabel: 'blocker',
+    title: 'Secure formal GenAI usage approval',
+    desc: 'Before deploying any AI tools, obtain formal approval. Work with your account team to add GenAI usage language to the MSA/SoW, or at minimum obtain written approval from the client. Without this, all other roadmap items carry compliance risk.',
+    effort: 'medium',
+    goal: 'level2',
+    condition: (a) => a.q1==='no_approval' || a.q1==='unknown'
+  },
+
+  // ── PHASE 1: Quick Wins (Week 1–2) ───────────────────────────
+  {
+    id: 'champion_appoint',
+    phase: 1,
+    criterion: 'AI Champions',
+    criterionLabel: 'scoring',
+    title: 'Appoint your first AI Champion',
+    desc: 'Nominate one person who is already enthusiastic about AI. Define their remit: running team sessions, maintaining shared prompts, and being the go-to for AI questions. This is a decision, not a project — it can happen today. Reference the AI Champion Playbook for role guidance.',
+    effort: 'low',
+    goal: 'level2',
+    condition: (a) => a.q6==='none'
+  },
+  {
+    id: 'tools_deploy',
+    phase: 1,
+    criterion: 'AI Tools',
+    criterionLabel: 'scoring',
+    title: 'Select and deploy a team-wide AI tool',
+    desc: 'Pick one AI tool with the fastest approval path for your project context (Claude Code, GitHub Copilot, or EPAM EliteA are common starting points). Work with IT/procurement to get licenses across the full team — partial rollout limits DAU growth. Even a free tier for the team to experiment is a valid first step.',
+    effort: 'medium',
+    goal: 'level2',
+    condition: (a) => !a.q12 || a.q12.length === 0
+  },
+  {
+    id: 'dau_measure',
+    phase: 1,
+    criterion: 'DAU',
+    criterionLabel: 'scoring',
+    title: 'Set up a DAU measurement method',
+    desc: 'Start a weekly Slack or email poll: "Did you use an AI tool at least once today?" Run it for one week to get a baseline. If your tools have telemetry (GitHub Copilot Analytics, Azure Monitor), set up a dashboard instead — it gives continuous data with no survey overhead.',
+    effort: 'low',
+    goal: 'level2',
+    condition: (a) => a.q3==='not_measured'
+  },
+  {
+    id: 'metrics_one',
+    phase: 1,
+    criterion: 'Performance Metrics',
+    criterionLabel: 'scoring',
+    title: 'Start tracking at least one productivity metric',
+    desc: 'Cycle time is the fastest to get started — most Jira and Azure DevOps setups track time-in-status with no extra configuration. Pull a "flow time" or "time in status" report for your backlog. Even a monthly export to a spreadsheet counts. You need this as a baseline before AI gains become measurable.',
+    effort: 'low',
+    goal: 'level2',
+    condition: (a) => a.q4==='none'
+  },
+
+  // ── PHASE 2: Foundation (Weeks 3–6) ───────────────────────────
+  {
+    id: 'onboarding_create',
+    phase: 2,
+    criterion: 'AI Artifacts',
+    criterionLabel: 'scoring',
+    title: 'Create shared prompts and onboarding materials',
+    desc: 'Have your AI Champion create a Confluence page or SharePoint folder with 10–15 role-specific prompts for the most common tasks (e.g. user story writing, code review, test case generation, PR summaries). This gives every team member a starting point and directly enables DAU growth. Update it every two weeks based on what the team finds useful.',
+    effort: 'medium',
+    goal: 'level2',
+    condition: (a) => a.q8==='none'
+  },
+  {
+    id: 'dau_onboard',
+    phase: 2,
+    criterion: 'DAU',
+    criterionLabel: 'scoring',
+    title: 'Run AI onboarding sessions per role',
+    desc: 'Run short (30–60 min) hands-on workshops for each core role showing how AI helps with their most frequent tasks. Focus on the concrete time-save for each role, not AI in general. Address access or permission blockers raised by the team. Your AI Champion should own and run these. Target: every core role has had at least one session by end of Phase 2.',
+    effort: 'medium',
+    goal: 'level2',
+    condition: (a) => a.q3==='sub30' || a.q3==='30-49' || a.q3==='not_measured'
+  },
+  {
+    id: 'cost_identify',
+    phase: 2,
+    criterion: 'AI Cost Tracking',
+    criterionLabel: 'scoring',
+    title: 'Identify and document AI cost sources',
+    desc: 'List every AI tool license and inference cost the project is paying. Even a simple spreadsheet counts. If cost data is client-owned, start a conversation about access or whether they can provide a summary report. Knowing your AI spend is the baseline for eventual optimization.',
+    effort: 'low',
+    goal: 'level2',
+    condition: (a) => a.q10==='no_visibility'
+  },
+
+  // ── PHASE 3: Adoption Drive (Month 2–3) ───────────────────────
+  {
+    id: 'deliverables_map',
+    phase: 3,
+    criterion: 'AI-Assisted Deliverables',
+    criterionLabel: 'core',
+    title: 'Map and target AI-assisted workflows per core role',
+    desc: 'For each core role, list the top 3 most frequent deliverables. Create an AI-assisted workflow for each (a prompt + process guide). Run role-specific sessions led by your AI Champion. Begin tracking which deliverables are AI-assisted (an "AI-used" Jira label works well). Goal: get at least 50% of all deliverables across core roles AI-assisted.',
+    effort: 'high',
+    goal: 'level2',
+    condition: (a) => a.q9==='sub25' || a.q9==='setting_up'
+  },
+  {
+    id: 'deliverables_push',
+    phase: 3,
+    criterion: 'AI-Assisted Deliverables',
+    criterionLabel: 'core',
+    title: 'Push AI-assisted deliverables above 50% (Level 2 core criterion)',
+    desc: 'You\'re in range — identify which roles are currently below 50% and focus your AI Champion\'s energy there. Look for tasks still done fully manually that could easily be AI-assisted (documentation updates, status summaries, test case generation). A targeted 2-week sprint with the laggard roles usually closes the gap.',
+    effort: 'medium',
+    goal: 'level2',
+    condition: (a) => a.q9==='25-49'
+  },
+  {
+    id: 'dau_grow',
+    phase: 3,
+    criterion: 'DAU',
+    criterionLabel: 'scoring',
+    title: 'Drive DAU above 50% across the team',
+    desc: 'Survey team members not using AI daily to understand blockers: tool access issues, lack of relevant prompts for their role, or not seeing value. For each blocker type, create a targeted intervention. Common fix: role-specific prompt guides make AI immediately useful for skeptical team members.',
+    effort: 'medium',
+    goal: 'level2',
+    condition: (a) => a.q3==='sub30' || a.q3==='30-49'
+  },
+  {
+    id: 'metrics_partial',
+    phase: 3,
+    criterion: 'Performance Metrics',
+    criterionLabel: 'scoring',
+    title: 'Add the missing metric dimensions',
+    desc: 'You\'re tracking some metrics but not all three. Add throughput (velocity or tasks delivered) and/or a quality metric (defect containment rate is usually easiest). Without all three, it\'s hard to demonstrate AI\'s full impact. Most teams find that once AI is active, quality metrics are the most compelling to share with clients.',
+    effort: 'medium',
+    goal: 'level2',
+    condition: (a) => a.q4==='partial'
+  },
+  {
+    id: 'cost_review',
+    phase: 3,
+    criterion: 'AI Cost Tracking',
+    criterionLabel: 'scoring',
+    title: 'Establish a regular AI cost review cadence',
+    desc: 'Schedule a recurring monthly 30-minute session to review AI spend vs. output improvements. Compare license costs against measured productivity gains. Even basic math (time saved × hourly rate vs. license cost) tells a compelling story. Document findings — this evidence is required for Level 3 assessment.',
+    effort: 'low',
+    goal: 'level3',
+    condition: (a) => a.q10==='visibility_only'
+  },
+
+  // ── PHASE 4: Mastery / Level 3 (Month 4+) ─────────────────────
+  {
+    id: 'champions_expand',
+    phase: 4,
+    criterion: 'AI Champions',
+    criterionLabel: 'scoring',
+    title: 'Expand AI Champions to cover all core roles',
+    desc: 'Identify the most AI-capable person in each remaining core role and give them the AI Champion role for that role. Use your existing champion to train and mentor them. Reference the AI Champion Playbook. Each champion should own role-specific prompts, run peer sessions, and track AI-assisted deliverables for their role.',
+    effort: 'medium',
+    goal: 'level3',
+    condition: (a) => a.q6==='one'
+  },
+  {
+    id: 'deliverables_75',
+    phase: 4,
+    criterion: 'AI-Assisted Deliverables',
+    criterionLabel: 'core',
+    title: 'Push AI-assisted deliverables above 75% (Level 3 core criterion)',
+    desc: 'Expand AI-assisted workflows from primary tasks to secondary tasks and edge cases. Ensure every core role consistently exceeds 75%, not just the most active ones. Review which types of work are still done manually — these are your remaining opportunities.',
+    effort: 'medium',
+    goal: 'level3',
+    condition: (a) => a.q9==='50-74'
+  },
+  {
+    id: 'dau_70',
+    phase: 4,
+    criterion: 'DAU',
+    criterionLabel: 'scoring',
+    title: 'Push DAU above 70% (Level 3 threshold)',
+    desc: 'Investigate who isn\'t using AI daily and why. At this stage, low DAU is usually due to a small number of holdouts or specific roles where AI integration feels forced. Work with champions in those roles to identify at least one daily task AI can genuinely help with.',
+    effort: 'medium',
+    goal: 'level3',
+    condition: (a) => a.q3==='50-69'
+  },
+  {
+    id: 'artifacts_codify',
+    phase: 4,
+    criterion: 'AI Artifacts',
+    criterionLabel: 'scoring',
+    title: 'Codify AI artifacts under source control',
+    desc: 'Move your prompts, rules, and agent configurations into a Git repository. Use CLAUDE.md, .cursorrules, or equivalent instruction files. Treat prompt changes like code: PR reviews, versioning, changelogs. Set up a lightweight CI check to validate that key prompt files are present and well-formed. This is mandatory for Level 3 assessment.',
+    effort: 'high',
+    goal: 'level3',
+    condition: (a) => a.q8==='onboarding'
+  },
+  {
+    id: 'metrics_all',
+    phase: 4,
+    criterion: 'Performance Metrics',
+    criterionLabel: 'scoring',
+    title: 'Track all three metric dimensions (cycle time + throughput + quality)',
+    desc: 'Level 3 requires all three. If quality metrics are missing, start with defect containment rate — track bugs found in QA vs. bugs found in production. Add this alongside your existing cycle time and throughput tracking. Automate the reporting if possible via Jira/Azure DevOps dashboards.',
+    effort: 'medium',
+    goal: 'level3',
+    condition: (a) => a.q4==='partial' || a.q4==='none'
+  },
+  {
+    id: 'novel_pilot',
+    phase: 4,
+    criterion: 'Novel AI Tools',
+    criterionLabel: 'core',
+    title: 'Pilot a Novel AI approach (Level 3 core criterion)',
+    desc: 'Identify one complex, high-value workflow to pilot with novel AI: multi-agent orchestration, spec-driven development, automated test scenario generation from requirements, or on-prem model deployment. Start small — a PoC with one role is enough. Capture evidence in source control (agent code, workflow scripts) to support Level 3 assessment.',
+    effort: 'high',
+    goal: 'level3',
+    condition: (a) => a.q11==='commodity'
+  },
+  {
+    id: 'cost_optimize',
+    phase: 4,
+    criterion: 'AI Cost Tracking',
+    criterionLabel: 'scoring',
+    title: 'Implement proactive AI cost optimization reviews',
+    desc: 'Elevate cost reviews from observation to action. For each AI tool: track spend vs. measurable output, identify underutilised licenses, and run quarterly optimisation decisions (keep / expand / replace). Document decisions and outcomes. Provide cost analytics screenshots for Level 3 evidence.',
+    effort: 'medium',
+    goal: 'level3',
+    condition: (a) => a.q10==='no_visibility' || a.q10==='visibility_only'
+  },
+];
+
+const PHASE_META = {
+  1: { cls:'p1', title:'Phase 1 — Quick Wins',   timeline:'Weeks 1–2',  desc:'No dependencies. Start these immediately.' },
+  2: { cls:'p2', title:'Phase 2 — Foundation',   timeline:'Weeks 3–6',  desc:'Build the infrastructure that enables team-wide adoption.' },
+  3: { cls:'p3', title:'Phase 3 — Adoption Drive', timeline:'Month 2–3', desc:'Scale usage and close the gaps to Level 2.' },
+  4: { cls:'p4', title:'Phase 4 — Mastery',      timeline:'Month 4+',   desc:'Advance beyond Level 2 toward Level 3.' },
+};
+
+function renderRoadmap(answers) {
+  const container = document.getElementById('roadmap-phases');
+
+  // Collect applicable actions
+  const applicable = ROADMAP_ITEMS.filter(item => item.condition(answers));
+
+  if (applicable.length === 0) {
+    container.innerHTML = '<div class="roadmap-empty">🎉 No gaps identified — all scoring criteria are fully met!</div>';
+    return;
+  }
+
+  // Group by phase
+  const byPhase = {};
+  applicable.forEach(item => {
+    if (!byPhase[item.phase]) byPhase[item.phase] = [];
+    byPhase[item.phase].push(item);
+  });
+
+  const effortLabel = { low:'Low effort', medium:'Medium effort', high:'High effort' };
+  const goalLabel = { level2:'→ Level 2', level3:'→ Level 3' };
+
+  let html = '';
+  Object.keys(byPhase).sort().forEach(ph => {
+    const meta = PHASE_META[ph];
+    const items = byPhase[ph];
+    html += `
+      <div class="phase-block">
+        <div class="phase-header">
+          <div class="phase-num ${meta.cls}">${ph}</div>
+          <div class="phase-title-wrap">
+            <div class="phase-title">${meta.title}</div>
+            <div class="phase-timeline">${meta.timeline} &nbsp;·&nbsp; ${meta.desc}</div>
+          </div>
+        </div>
+        <div class="phase-actions">
+          ${items.map(item => {
+            const isBlocker = item.criterionLabel === 'blocker';
+            const tagCls = isBlocker ? 'blocker-tag' : '';
+            const cardCls = isBlocker ? 'action-card blocker' : `action-card goal-${item.goal==='level2'?'l2':'l3'}`;
+            return `
+              <div class="${cardCls}">
+                <div class="action-top">
+                  <span class="action-criterion-tag ${tagCls}">${item.criterion}</span>
+                  <span class="action-goal-badge ${item.goal==='level2'?'l2':'l3'}">${goalLabel[item.goal]}</span>
+                  <span class="action-effort ${item.effort}">${effortLabel[item.effort]}</span>
+                  ${item.criterionLabel==='core' ? '<span class="action-effort" style="background:#FCE4EC;color:#B71C1C;">Core Criterion</span>' : ''}
+                </div>
+                <div class="action-title">${item.title}</div>
+                <div class="action-desc">${item.desc}</div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Evidence toggle ──
+function toggleEvidence(id) {
+  const box = document.getElementById(id);
+  const btn = box.previousElementSibling;
+  const isOpen = box.classList.contains('visible');
+  box.classList.toggle('visible', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+  btn.querySelector('.arrow').textContent = isOpen ? '▶' : '▼';
+}
+
+// Init (textarea pre-filled)
+updateProgress(); markCard(7,true);
+</script>
+</body>
+</html>
