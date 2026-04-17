@@ -1,687 +1,1643 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI SDLC Maturity — Interactive Assessment</title>
-  <style>
-    :root {
-      --primary: #5B4FCF;
-      --primary-dark: #3E33A3;
-      --primary-light: #EEF0FF;
-      --easy: #22C55E;
-      --medium: #F59E0B;
-      --text: #1A1A2E;
-      --text-muted: #6B7280;
-      --border: #E2E4F0;
-      --bg: #F7F8FC;
-      --surface: #FFFFFF;
-      --surface2: #F0F2FA;
-      --radius: 10px;
-      --header-h: 68px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); background: var(--bg); }
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>AI SDLC Maturity — Interactive Assessment</title>
+		<style>
+			:root {
+				--primary: #5b4fcf;
+				--primary-dark: #3e33a3;
+				--primary-light: #eef0ff;
+				--easy: #22c55e;
+				--medium: #f59e0b;
+				--text: #1a1a2e;
+				--text-muted: #6b7280;
+				--border: #e2e4f0;
+				--bg: #f7f8fc;
+				--surface: #ffffff;
+				--surface2: #f0f2fa;
+				--radius: 10px;
+				--header-h: 68px;
+			}
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+			html,
+			body {
+				height: 100%;
+				font-family:
+					-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+					sans-serif;
+				color: var(--text);
+				background: var(--bg);
+			}
 
-    /* ── Header ── */
-    .hdr {
-      height: var(--header-h);
-      background: linear-gradient(135deg, #3E33A3 0%, #5B4FCF 60%, #7B6FF0 100%);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 28px; position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      box-shadow: 0 2px 12px rgba(0,0,0,.2);
-    }
-    .hdr-left { display: flex; align-items: center; gap: 12px; }
-    .hdr-title { font-size: 16px; font-weight: 700; color: white; }
-    .hdr-sub { font-size: 12px; color: rgba(255,255,255,.7); }
-    .hdr-badge { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: white; }
-    .hdr-right { display: flex; align-items: center; gap: 16px; }
-    .hdr-progress { display: flex; align-items: center; gap: 10px; }
-    .hdr-prog-bar { width: 120px; height: 6px; background: rgba(255,255,255,.25); border-radius: 4px; overflow: hidden; }
-    .hdr-prog-fill { height: 100%; background: var(--easy); border-radius: 4px; transition: width .4s ease; }
-    .hdr-prog-lbl { font-size: 12px; color: rgba(255,255,255,.8); min-width: 50px; text-align: right; }
-    .hdr-level { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 8px; padding: 4px 14px; font-size: 13px; font-weight: 700; color: white; white-space: nowrap; }
-    .btn-reset-hdr { background: transparent; border: 1px solid rgba(255,255,255,.3); border-radius: 6px; color: rgba(255,255,255,.7); padding: 4px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
-    .btn-reset-hdr:hover { border-color: white; color: white; }
+			/* ── Header ── */
+			.hdr {
+				height: var(--header-h);
+				background: linear-gradient(
+					135deg,
+					#3e33a3 0%,
+					#5b4fcf 60%,
+					#7b6ff0 100%
+				);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 0 28px;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				z-index: 100;
+				box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+			}
+			.hdr-left {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+			.hdr-title {
+				font-size: 16px;
+				font-weight: 700;
+				color: white;
+			}
+			.hdr-sub {
+				font-size: 12px;
+				color: rgba(255, 255, 255, 0.7);
+			}
+			.hdr-badge {
+				background: rgba(255, 255, 255, 0.15);
+				border: 1px solid rgba(255, 255, 255, 0.25);
+				border-radius: 20px;
+				padding: 3px 12px;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 0.5px;
+				text-transform: uppercase;
+				color: white;
+			}
+			.hdr-right {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+			}
+			.hdr-level {
+				background: rgba(255, 255, 255, 0.15);
+				border: 1px solid rgba(255, 255, 255, 0.3);
+				border-radius: 8px;
+				padding: 4px 14px;
+				font-size: 13px;
+				font-weight: 700;
+				color: white;
+				white-space: nowrap;
+			}
+			.btn-reset-hdr {
+				background: transparent;
+				border: 1px solid rgba(255, 255, 255, 0.3);
+				border-radius: 6px;
+				color: rgba(255, 255, 255, 0.7);
+				padding: 4px 12px;
+				font-size: 12px;
+				cursor: pointer;
+				font-family: inherit;
+			}
+			.btn-reset-hdr:hover {
+				border-color: white;
+				color: white;
+			}
 
-    /* ── Two-panel layout ── */
-    .layout {
-      display: grid;
-      grid-template-columns: 460px 1fr;
-      height: calc(100vh - var(--header-h));
-      margin-top: var(--header-h);
-      overflow: hidden;
-    }
+			/* ── Two-panel layout ── */
+			.layout {
+				display: grid;
+				grid-template-columns: 460px 1fr;
+				height: calc(100vh - var(--header-h));
+				margin-top: var(--header-h);
+				overflow: hidden;
+			}
 
-    /* ── Left: Questions ── */
-    .q-panel {
-      overflow-y: auto; background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 24px 20px 60px;
-      scroll-behavior: smooth;
-    }
-    .q-panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 16px; }
+			/* ── Left: Questions ── */
+			.q-panel {
+				overflow-y: auto;
+				background: var(--surface);
+				border-right: 1px solid var(--border);
+				padding: 24px 20px 60px;
+				scroll-behavior: smooth;
+			}
+			.q-panel-title {
+				font-size: 12px;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				color: var(--text-muted);
+				margin-bottom: 16px;
+			}
 
-    /* Question card */
-    .qc { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; transition: border-color .2s; scroll-margin-top: 12px; }
-    .qc.answered { border-color: var(--easy); border-left-width: 3px; }
-    .qc.highlight { background: var(--primary-light); border-color: var(--primary); }
-    .qc-hdr { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
-    .qc-num { width: 22px; height: 22px; border-radius: 50%; background: var(--surface2); color: var(--text-muted); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-    .qc-num.done { background: var(--easy); color: white; }
-    .qc-title { font-size: 13px; font-weight: 600; line-height: 1.4; flex: 1; }
-    .qc-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: .3px; white-space: nowrap; flex-shrink: 0; }
-    .badge-core  { background: #FBE9E7; color: #BF360C; }
-    .badge-core3 { background: #FFF3E0; color: #E65100; }
-    .badge-score { background: #EDE7F6; color: #4527A0; }
-    .badge-ctx   { background: var(--surface2); color: var(--text-muted); }
+			/* Question card */
+			.qc {
+				background: var(--surface);
+				border: 1.5px solid var(--border);
+				border-radius: var(--radius);
+				padding: 14px 16px;
+				margin-bottom: 10px;
+				transition: border-color 0.2s;
+				scroll-margin-top: 12px;
+			}
+			.qc.answered {
+				border-color: var(--easy);
+				border-left-width: 3px;
+			}
+			.qc.highlight {
+				background: var(--primary-light);
+				border-color: var(--primary);
+			}
+			.qc-hdr {
+				display: flex;
+				align-items: flex-start;
+				gap: 8px;
+				margin-bottom: 10px;
+			}
+			.qc-num {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				background: var(--surface2);
+				color: var(--text-muted);
+				font-size: 10px;
+				font-weight: 700;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				margin-top: 1px;
+			}
+			.qc-num.done {
+				background: var(--easy);
+				color: white;
+			}
+			.qc-title {
+				font-size: 13px;
+				font-weight: 600;
+				line-height: 1.4;
+				flex: 1;
+			}
+			.qc-badge {
+				font-size: 10px;
+				font-weight: 700;
+				padding: 2px 6px;
+				border-radius: 4px;
+				text-transform: uppercase;
+				letter-spacing: 0.3px;
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+			.badge-core {
+				background: #fbe9e7;
+				color: #bf360c;
+			}
+			.badge-core3 {
+				background: #fff3e0;
+				color: #e65100;
+			}
+			.badge-score {
+				background: #ede7f6;
+				color: #4527a0;
+			}
+			.badge-ctx {
+				background: var(--surface2);
+				color: var(--text-muted);
+			}
 
-    /* Option pills */
-    .qc-opts { display: flex; flex-direction: column; gap: 5px; }
-    .qc-opts.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 5px; }
-    .qc-opt {
-      display: flex; align-items: flex-start; gap: 7px;
-      padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 7px;
-      cursor: pointer; font-size: 12px; line-height: 1.4;
-      transition: border-color .12s, background .12s; user-select: none;
-    }
-    .qc-opt:hover { border-color: var(--primary); background: var(--primary-light); }
-    .qc-opt.sel { border-color: var(--primary); background: var(--primary-light); }
-    .qc-opt-icon { flex-shrink: 0; font-size: 12px; margin-top: 1px; color: var(--text-muted); }
-    .qc-opt.sel .qc-opt-icon { color: var(--primary); }
+			/* Option pills */
+			.qc-opts {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+			}
+			.qc-opts.grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+				gap: 5px;
+			}
+			.qc-opt {
+				display: flex;
+				align-items: flex-start;
+				gap: 7px;
+				padding: 7px 10px;
+				border: 1.5px solid var(--border);
+				border-radius: 7px;
+				cursor: pointer;
+				font-size: 12px;
+				line-height: 1.4;
+				transition:
+					border-color 0.12s,
+					background 0.12s;
+				user-select: none;
+			}
+			.qc-opt:hover {
+				border-color: var(--primary);
+				background: var(--primary-light);
+			}
+			.qc-opt.sel {
+				border-color: var(--primary);
+				background: var(--primary-light);
+			}
+			.qc-opt-icon {
+				flex-shrink: 0;
+				font-size: 12px;
+				margin-top: 1px;
+				color: var(--text-muted);
+			}
+			.qc-opt.sel .qc-opt-icon {
+				color: var(--primary);
+			}
 
-    /* Context question (textarea) */
-    .qc-textarea {
-      width: 100%; min-height: 80px; border: 1.5px solid var(--border); border-radius: 7px;
-      padding: 8px 10px; font-family: inherit; font-size: 12px; color: var(--text);
-      line-height: 1.5; resize: vertical; outline: none; transition: border-color .15s;
-    }
-    .qc-textarea:focus { border-color: var(--primary); }
-    .qc-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+			/* Context question (textarea) */
+			.qc-textarea {
+				width: 100%;
+				min-height: 80px;
+				border: 1.5px solid var(--border);
+				border-radius: 7px;
+				padding: 8px 10px;
+				font-family: inherit;
+				font-size: 12px;
+				color: var(--text);
+				line-height: 1.5;
+				resize: vertical;
+				outline: none;
+				transition: border-color 0.15s;
+			}
+			.qc-textarea:focus {
+				border-color: var(--primary);
+			}
+			.qc-hint {
+				font-size: 11px;
+				color: var(--text-muted);
+				margin-bottom: 8px;
+				line-height: 1.5;
+			}
 
-    /* ── Right: Roadmap ── */
-    .rm-panel { overflow-y: auto; background: var(--bg); padding: 24px 22px 60px; }
+			.rm-summary-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+				gap: 10px;
+				margin-bottom: 16px;
+			}
+			.rm-summary-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				padding: 12px 14px;
+			}
+			.rm-summary-kicker {
+				font-size: 10px;
+				font-weight: 800;
+				text-transform: uppercase;
+				letter-spacing: 0.8px;
+				color: var(--text-muted);
+				margin-bottom: 6px;
+			}
+			.rm-summary-title {
+				font-size: 13px;
+				font-weight: 700;
+				line-height: 1.35;
+			}
+			.rm-summary-body {
+				font-size: 11px;
+				color: var(--text-muted);
+				line-height: 1.5;
+				margin-top: 5px;
+			}
+			.rm-summary-list {
+				margin-top: 7px;
+				padding-left: 18px;
+				font-size: 11px;
+				color: var(--text-muted);
+				line-height: 1.5;
+			}
+			.rm-summary-list li + li {
+				margin-top: 3px;
+			}
+			.rm-summary-empty {
+				font-style: italic;
+			}
 
-    .rm-panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 4px; }
-    .rm-empty-note { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+			/* ── Right: Roadmap ── */
+			.rm-panel {
+				overflow-y: auto;
+				background: var(--bg);
+				padding: 24px 22px 60px;
+			}
 
-    /* Level banner */
-    .rm-level-banner {
-      border-radius: var(--radius); padding: 14px 16px; margin-bottom: 20px;
-      display: flex; align-items: center; gap: 12px;
-      border: 1px solid var(--border);
-    }
-    .rm-level-banner.l1 { background: #F5F5F5; border-color: #BDBDBD; }
-    .rm-level-banner.l2 { background: #E3F0FF; border-color: #90CAF9; }
-    .rm-level-banner.l3 { background: #FFF8E1; border-color: #FFCC80; }
-    .rm-level-num { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; flex-shrink: 0; }
-    .l1 .rm-level-num { background: #9E9E9E; color: white; }
-    .l2 .rm-level-num { background: #1976D2; color: white; }
-    .l3 .rm-level-num { background: #F57C00; color: white; }
-    .rm-level-name { font-size: 14px; font-weight: 700; }
-    .rm-level-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .l1 .rm-level-name { color: #616161; }
-    .l2 .rm-level-name { color: #1565C0; }
-    .l3 .rm-level-name { color: #E65100; }
+			.rm-panel-title {
+				font-size: 12px;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				color: var(--text-muted);
+				margin-bottom: 4px;
+			}
+			.rm-empty-note {
+				font-size: 12px;
+				color: var(--text-muted);
+				margin-bottom: 20px;
+				line-height: 1.5;
+			}
 
-    /* Phase label */
-    .rm-phase { display: flex; align-items: center; gap: 8px; margin: 16px 0 8px; }
-    .rm-phase-icon { font-size: 13px; }
-    .rm-phase-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--text-muted); }
-    .rm-phase-line { flex: 1; height: 1px; background: var(--border); }
+			/* Level banner */
+			.rm-level-banner {
+				border-radius: var(--radius);
+				padding: 14px 16px;
+				margin-bottom: 20px;
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				border: 1px solid var(--border);
+			}
+			.rm-level-banner.l1 {
+				background: #f5f5f5;
+				border-color: #bdbdbd;
+			}
+			.rm-level-banner.l2 {
+				background: #e3f0ff;
+				border-color: #90caf9;
+			}
+			.rm-level-banner.l3 {
+				background: #fff8e1;
+				border-color: #ffcc80;
+			}
+			.rm-level-num {
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 18px;
+				font-weight: 800;
+				flex-shrink: 0;
+			}
+			.l1 .rm-level-num {
+				background: #9e9e9e;
+				color: white;
+			}
+			.l2 .rm-level-num {
+				background: #1976d2;
+				color: white;
+			}
+			.l3 .rm-level-num {
+				background: #f57c00;
+				color: white;
+			}
+			.rm-level-name {
+				font-size: 14px;
+				font-weight: 700;
+			}
+			.rm-level-sub {
+				font-size: 11px;
+				color: var(--text-muted);
+				margin-top: 2px;
+			}
+			.l1 .rm-level-name {
+				color: #616161;
+			}
+			.l2 .rm-level-name {
+				color: #1565c0;
+			}
+			.l3 .rm-level-name {
+				color: #e65100;
+			}
 
-    /* Gate banner */
-    .rm-gate { border-radius: 8px; padding: 10px 14px; margin: 14px 0 8px; display: flex; align-items: center; gap: 10px; border: 1px solid; position: relative; overflow: hidden; cursor: default; }
-    .rm-gate::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
-    .rm-gate.l2 { background: #E3F0FF; border-color: #90CAF9; }
-    .rm-gate.l2::before { background: #1976D2; }
-    .rm-gate.l3 { background: #FFF8E1; border-color: #FFCC80; }
-    .rm-gate.l3::before { background: #F57C00; }
-    .rm-gate.met { opacity: 1; }
-    .rm-gate-icon { font-size: 16px; flex-shrink: 0; }
-    .rm-gate-body { flex: 1; }
-    .rm-gate-title { font-size: 12px; font-weight: 700; }
-    .rm-gate.l2 .rm-gate-title { color: #1565C0; }
-    .rm-gate.l3 .rm-gate-title { color: #E65100; }
-    .rm-gate-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-    .rm-gate-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
-    .rm-gate-pill.met  { background: #E8F5E9; color: #2E7D32; }
-    .rm-gate-pill.unmet{ background: var(--surface2); color: var(--text-muted); }
+			/* Phase label */
+			.rm-phase {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin: 16px 0 8px;
+			}
+			.rm-phase-icon {
+				font-size: 13px;
+			}
+			.rm-phase-lbl {
+				font-size: 10px;
+				font-weight: 800;
+				text-transform: uppercase;
+				letter-spacing: 0.8px;
+				color: var(--text-muted);
+			}
+			.rm-phase-line {
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
 
-    /* Step */
-    .rm-step { display: flex; gap: 10px; margin-bottom: 2px; cursor: pointer; }
-    .rm-step:hover .rm-step-body { background: var(--primary-light); border-radius: 7px; }
-    .rm-step-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 24px; }
-    .rm-step-circle {
-      width: 22px; height: 22px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 700; flex-shrink: 0;
-      border: 2px solid var(--border); background: var(--surface); color: var(--text-muted);
-      transition: all .2s; z-index: 1;
-    }
-    .rm-step-circle.done    { background: var(--easy); border-color: var(--easy); color: white; }
-    .rm-step-circle.active  { background: var(--primary); border-color: var(--primary); color: white; }
-    .rm-step-circle.pending { background: var(--surface); border-color: var(--border); color: var(--border); }
-    .rm-step-line { width: 2px; flex: 1; background: var(--border); min-height: 8px; transition: background .3s; }
-    .rm-step-line.done { background: var(--easy); }
-    .rm-step-body { flex: 1; padding: 3px 8px 10px; transition: background .15s; }
-    .rm-step-hdr { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .rm-step-qtag { font-size: 9px; font-weight: 700; color: var(--text-muted); background: var(--surface2); border-radius: 3px; padding: 1px 5px; letter-spacing: .3px; flex-shrink: 0; }
-    .rm-step-title { font-size: 12px; font-weight: 700; line-height: 1.3; }
-    .rm-step-title.done    { color: var(--easy); }
-    .rm-step-title.active  { color: var(--primary); }
-    .rm-step-title.pending { color: var(--text-muted); }
-    .rm-step-core { font-size: 9px; font-weight: 700; color: #BF360C; background: #FBE9E7; border-radius: 3px; padding: 1px 5px; }
-    .rm-step-answer { font-size: 11px; font-weight: 600; margin-top: 3px; display: inline-block; padding: 2px 8px; border-radius: 10px; }
-    .rm-step-answer.done   { background: #E8F5E9; color: #2E7D32; }
-    .rm-step-answer.active { background: #E3F0FF; color: #1565C0; }
-    .rm-step-answer.pending{ background: var(--surface2); color: var(--text-muted); font-weight: 400; font-style: italic; }
+			/* Gate banner */
+			.rm-gate {
+				border-radius: 8px;
+				padding: 10px 14px;
+				margin: 14px 0 8px;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				border: 1px solid;
+				position: relative;
+				overflow: hidden;
+				cursor: default;
+			}
+			.rm-gate::before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				width: 3px;
+			}
+			.rm-gate.l2 {
+				background: #e3f0ff;
+				border-color: #90caf9;
+			}
+			.rm-gate.l2::before {
+				background: #1976d2;
+			}
+			.rm-gate.l3 {
+				background: #fff8e1;
+				border-color: #ffcc80;
+			}
+			.rm-gate.l3::before {
+				background: #f57c00;
+			}
+			.rm-gate.met {
+				opacity: 1;
+			}
+			.rm-gate-icon {
+				font-size: 16px;
+				flex-shrink: 0;
+			}
+			.rm-gate-body {
+				flex: 1;
+			}
+			.rm-gate-title {
+				font-size: 12px;
+				font-weight: 700;
+			}
+			.rm-gate.l2 .rm-gate-title {
+				color: #1565c0;
+			}
+			.rm-gate.l3 .rm-gate-title {
+				color: #e65100;
+			}
+			.rm-gate-sub {
+				font-size: 11px;
+				color: var(--text-muted);
+				margin-top: 1px;
+			}
+			.rm-gate-pill {
+				font-size: 10px;
+				font-weight: 700;
+				padding: 2px 8px;
+				border-radius: 10px;
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+			.rm-gate-pill.met {
+				background: #e8f5e9;
+				color: #2e7d32;
+			}
+			.rm-gate-pill.unmet {
+				background: var(--surface2);
+				color: var(--text-muted);
+			}
+			.rm-gate-detail {
+				margin-top: 6px;
+				font-size: 11px;
+				color: var(--text-muted);
+				line-height: 1.5;
+			}
+			.rm-gate-detail strong {
+				color: var(--text);
+			}
 
-    /* Mobile: stack panels */
-    @media (max-width: 800px) {
-      .layout { grid-template-columns: 1fr; height: auto; overflow: visible; }
-      .q-panel, .rm-panel { overflow: visible; height: auto; }
-      .q-panel { border-right: none; border-bottom: 1px solid var(--border); }
-      .hdr-progress, .hdr-badge { display: none; }
-    }
-  </style>
-</head>
-<body>
+			/* Step */
+			.rm-step {
+				display: flex;
+				gap: 10px;
+				margin-bottom: 2px;
+				cursor: pointer;
+			}
+			.rm-step:hover .rm-step-body {
+				background: var(--primary-light);
+				border-radius: 7px;
+			}
+			.rm-step-left {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				flex-shrink: 0;
+				width: 24px;
+			}
+			.rm-step-circle {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 10px;
+				font-weight: 700;
+				flex-shrink: 0;
+				border: 2px solid var(--border);
+				background: var(--surface);
+				color: var(--text-muted);
+				transition: all 0.2s;
+				z-index: 1;
+			}
+			.rm-step-circle.done {
+				background: var(--easy);
+				border-color: var(--easy);
+				color: white;
+			}
+			.rm-step-circle.active {
+				background: var(--primary);
+				border-color: var(--primary);
+				color: white;
+			}
+			.rm-step-circle.pending {
+				background: var(--surface);
+				border-color: var(--border);
+				color: var(--border);
+			}
+			.rm-step-line {
+				width: 2px;
+				flex: 1;
+				background: var(--border);
+				min-height: 8px;
+				transition: background 0.3s;
+			}
+			.rm-step-line.done {
+				background: var(--easy);
+			}
+			.rm-step-body {
+				flex: 1;
+				padding: 3px 8px 10px;
+				transition: background 0.15s;
+			}
+			.rm-step-hdr {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-wrap: wrap;
+			}
+			.rm-step-qtag {
+				font-size: 9px;
+				font-weight: 700;
+				color: var(--text-muted);
+				background: var(--surface2);
+				border-radius: 3px;
+				padding: 1px 5px;
+				letter-spacing: 0.3px;
+				flex-shrink: 0;
+			}
+			.rm-step-title {
+				font-size: 12px;
+				font-weight: 700;
+				line-height: 1.3;
+			}
+			.rm-step-title.done {
+				color: var(--easy);
+			}
+			.rm-step-title.active {
+				color: var(--primary);
+			}
+			.rm-step-title.pending {
+				color: var(--text-muted);
+			}
+			.rm-step-core {
+				font-size: 9px;
+				font-weight: 700;
+				color: #bf360c;
+				background: #fbe9e7;
+				border-radius: 3px;
+				padding: 1px 5px;
+			}
+			.rm-step-answer {
+				font-size: 11px;
+				font-weight: 600;
+				margin-top: 3px;
+				display: inline-block;
+				padding: 2px 8px;
+				border-radius: 10px;
+			}
+			.rm-step-answer.done {
+				background: #e8f5e9;
+				color: #2e7d32;
+			}
+			.rm-step-answer.active {
+				background: #e3f0ff;
+				color: #1565c0;
+			}
+			.rm-step-answer.pending {
+				background: var(--surface2);
+				color: var(--text-muted);
+				font-weight: 400;
+				font-style: italic;
+			}
 
-<!-- ── Header ── -->
-<header class="hdr">
-  <div class="hdr-left">
-    <div>
-      <div class="hdr-title">🗺️ AI SDLC Maturity</div>
-      <div class="hdr-sub">Answer questions · watch your roadmap build</div>
-    </div>
-  </div>
-  <div class="hdr-right">
-    <div class="hdr-progress">
-      <div class="hdr-prog-bar"><div class="hdr-prog-fill" id="hdr-fill" style="width:0%"></div></div>
-      <div class="hdr-prog-lbl" id="hdr-pct">0 / 12</div>
-    </div>
-    <div class="hdr-level" id="hdr-level">Level 1</div>
-    <button class="btn-reset-hdr" onclick="resetAll()">↺ Reset</button>
-  </div>
-</header>
+			/* Mobile: stack panels */
+			@media (max-width: 800px) {
+				.layout {
+					grid-template-columns: 1fr;
+					height: auto;
+					overflow: visible;
+				}
+				.q-panel,
+				.rm-panel {
+					overflow: visible;
+					height: auto;
+				}
+				.q-panel {
+					border-right: none;
+					border-bottom: 1px solid var(--border);
+				}
+				.hdr-badge {
+					display: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<!-- ── Header ── -->
+		<header class="hdr">
+			<div class="hdr-left">
+				<div>
+					<div class="hdr-title">🗺️ AI SDLC Maturity</div>
+					<div class="hdr-sub">
+						Answer questions · watch your roadmap build
+					</div>
+				</div>
+			</div>
+			<div class="hdr-right">
+				<div class="hdr-level" id="hdr-level">Level 1</div>
+				<button class="btn-reset-hdr" onclick="resetAll()">
+					↺ Reset
+				</button>
+			</div>
+		</header>
 
-<!-- ── Layout ── -->
-<div class="layout">
+		<!-- ── Layout ── -->
+		<div class="layout">
+			<!-- LEFT: Questions -->
+			<div class="q-panel" id="q-panel">
+				<div class="q-panel-title">Questionnaire</div>
+				<div id="questions-root"></div>
+			</div>
 
-  <!-- LEFT: Questions -->
-  <div class="q-panel" id="q-panel">
-    <div class="q-panel-title">Questionnaire</div>
-    <div id="questions-root"></div>
-  </div>
+			<!-- RIGHT: Roadmap -->
+			<div class="rm-panel" id="rm-panel">
+				<div class="rm-panel-title">Your Roadmap</div>
+				<div class="rm-empty-note" id="rm-note">
+					Start answering questions on the left — your roadmap will
+					build as you go.
+				</div>
+				<div id="rm-summary"></div>
+				<div id="rm-level-banner"></div>
+				<div id="rm-steps"></div>
+			</div>
+		</div>
 
-  <!-- RIGHT: Roadmap -->
-  <div class="rm-panel" id="rm-panel">
-    <div class="rm-panel-title">Your Roadmap</div>
-    <div class="rm-empty-note" id="rm-note">Start answering questions on the left — your roadmap will build as you go.</div>
-    <div id="rm-level-banner"></div>
-    <div id="rm-steps"></div>
-  </div>
+		<script>
+			// ═════════════════════════════════════════════════════════════════
+			// STATE
+			// ═════════════════════════════════════════════════════════════════
+			const STORE_KEY = "ai_sdlc_interactive_v1";
 
-</div>
+			function loadAnswers() {
+				try {
+					return JSON.parse(localStorage.getItem(STORE_KEY)) || {};
+				} catch (e) {
+					return {};
+				}
+			}
+			function saveAnswers(a) {
+				try {
+					localStorage.setItem(STORE_KEY, JSON.stringify(a));
+				} catch (e) {}
+			}
+			function resetAll() {
+				if (!confirm("Reset all answers and start fresh?")) return;
+				localStorage.removeItem(STORE_KEY);
+				answers = {};
+				renderAll();
+			}
 
-<script>
-// ═════════════════════════════════════════════════════════════════
-// STATE
-// ═════════════════════════════════════════════════════════════════
-const STORE_KEY = 'ai_sdlc_interactive_v1';
+			let answers = loadAnswers();
 
-function loadAnswers() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
-  catch(e) { return {}; }
-}
-function saveAnswers(a) {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(a)); } catch(e) {}
-}
-function resetAll() {
-  if (!confirm('Reset all answers and start fresh?')) return;
-  localStorage.removeItem(STORE_KEY);
-  answers = {};
-  renderAll();
-}
+			// ═════════════════════════════════════════════════════════════════
+			// QUESTION DEFINITIONS (Q1–Q12 in natural order, Q7 after Q6)
+			// ═════════════════════════════════════════════════════════════════
+			const QUESTIONS = [
+				{
+					id: "q1",
+					num: 1,
+					badge: "ctx",
+					title: "Does your project have formal approval for Generative AI usage in the MSA and SoW?",
+					type: "radio",
+					hint: "Restricted approval or written approval is sufficient to proceed. Prohibited or unknown is a real blocker and should be surfaced explicitly.",
+					opts: [
+						{
+							v: "prohibited",
+							l: "No — client explicitly prohibits GenAI",
+						},
+						{
+							v: "no_approval",
+							l: "No — approval not obtained yet",
+						},
+						{
+							v: "written_approval",
+							l: "No, but we have written client approval",
+						},
+						{
+							v: "restricted",
+							l: "Yes — approved with restrictions",
+						},
+						{ v: "widely", l: "Yes — approved widely" },
+						{ v: "unknown", l: "I don't know — need to find out" },
+					],
+				},
+				{
+					id: "q2",
+					num: 2,
+					badge: "ctx",
+					title: "Are you using AI for SDLC on your project?",
+					type: "radio",
+					hint: "For mixed EPAM and client/vendor teams, answer based on the EPAM part of the project only.",
+					opts: [
+						{ v: "using", l: "Using AI for SDLC" },
+						{ v: "discussion", l: "Under discussion with client" },
+						{ v: "not_using", l: "Not using AI" },
+					],
+				},
+				{
+					id: "q3",
+					num: 3,
+					badge: "score",
+					title: "Daily active usage — at least one AI interaction per day (DAU)",
+					type: "radio",
+					hint: "Telemetry or survey-based measurement both count. In restricted client environments, self-reported data is acceptable.",
+					opts: [
+						{ v: "80plus", l: "More than 80%" },
+						{ v: "70-80", l: "70%–80%" },
+						{ v: "50-69", l: "50%–69%" },
+						{ v: "30-49", l: "30%–49%" },
+						{ v: "sub30", l: "Less than 30%" },
+						{ v: "not_measured", l: "Not measured" },
+					],
+				},
+				{
+					id: "q4",
+					num: 4,
+					badge: "score",
+					title: "Productivity metrics tracking (throughput, cycle time, quality)",
+					type: "radio",
+					hint: "Level 2 needs at least one metric type. Level 3 needs all three. Story-point baselines may shift over time as AI adoption stabilizes.",
+					opts: [
+						{
+							v: "all_three",
+							l: "Track cycle time AND throughput AND quality",
+						},
+						{ v: "partial", l: "Track one or two of the above" },
+						{ v: "none", l: "Not tracking any" },
+					],
+				},
+				{
+					id: "q5",
+					num: 5,
+					badge: "ctx",
+					title: "How do you track productivity metrics?",
+					type: "radio",
+					hint: "Automated, survey-based, or mixed approaches are all valid. Choose the dominant method used on the project.",
+					opts: [
+						{
+							v: "automated",
+							l: "Automated (Jira, Azure DevOps, GitHub)",
+						},
+						{ v: "surveys", l: "Surveys" },
+						{ v: "mixed", l: "Mixed — automated + surveys" },
+						{ v: "other", l: "Other" },
+					],
+				},
+				{
+					id: "q6",
+					num: 6,
+					badge: "score",
+					title: "AI Champions presence on your project",
+					type: "radio",
+					hint: "Core roles are defined by the PM for this project. A champion from a neighboring project can count if they actively enable adoption here.",
+					opts: [
+						{ v: "all_roles", l: "Champions for all core roles" },
+						{ v: "one", l: "One AI Champion" },
+						{ v: "none", l: "No AI Champions" },
+					],
+				},
+				{
+					id: "q7",
+					num: 7,
+					badge: "ctx",
+					title: "For each AI Champion — role(s) covered and AI activities performed",
+					type: "textarea",
+					hint: "Use this field to explain champion coverage, adoption activities, and any evidence that supports Q6 or Q9 calculations.",
+					placeholder:
+						"e.g. Jane Smith — covers backend devs. Activities: maintains prompt library, runs bi-weekly workshops, reviews AI-generated code…",
+				},
+				{
+					id: "q8",
+					num: 8,
+					badge: "score",
+					title: "Reusability of AI artifacts on your project",
+					type: "radio",
+					hint: "Think beyond tools. Reusability is about prompts, rules, workflows, instructions, skills, and agents that other team members can reuse consistently.",
+					opts: [
+						{
+							v: "codified",
+							l: "Rules and agents are codified as code (versioned, reviewed, in repositories)",
+						},
+						{
+							v: "onboarding",
+							l: "Shared prompts, rules, and agents are in onboarding materials",
+						},
+						{ v: "none", l: "None of the above" },
+					],
+				},
+				{
+					id: "q9",
+					num: 9,
+					badge: "core",
+					title: "What % of deliverables/tasks are created or meaningfully assisted by AI?",
+					type: "radio",
+					hint: "Estimate this across all PM-defined core roles combined, not role by role. Manual estimation and automated tagging are both acceptable.",
+					opts: [
+						{ v: "75plus", l: "75% or more" },
+						{ v: "50-74", l: "50% to 74%" },
+						{ v: "25-49", l: "25% to 49%" },
+						{ v: "sub25", l: "Less than 25%" },
+						{
+							v: "setting_up",
+							l: "Setting up — not yet measurable",
+						},
+					],
+				},
+				{
+					id: "q10",
+					num: 10,
+					badge: "score",
+					title: "How do you track and manage AI usage costs?",
+					type: "radio",
+					hint: "If direct cost data is not available, token or inference usage still helps. Client-restricted visibility stays below strict Level 2 scoring, but can be documented for manual review.",
+					opts: [
+						{
+							v: "visibility_reviews",
+							l: "Visibility into costs + regular optimization reviews",
+						},
+						{
+							v: "visibility_only",
+							l: "Visibility into costs, no regular reviews",
+						},
+						{
+							v: "no_visibility",
+							l: "No visibility — client-owned or restricted",
+						},
+					],
+				},
+				{
+					id: "q11",
+					num: 11,
+					badge: "core3",
+					title: "What types of AI tools/approaches do you use to create deliverables?",
+					type: "radio",
+					hint: "Novel is about workflow maturity, not just tool names. Judge this against the current quarterly baseline and whether the approach is embedded in real delivery work.",
+					opts: [
+						{ v: "novel", l: "Mostly Novel AI Tools" },
+						{ v: "commodity", l: "Mostly Commodity AI Tools" },
+					],
+				},
+				{
+					id: "q12",
+					num: 12,
+					badge: "score",
+					title: "Which AI-powered tools does your team use? (select all that apply)",
+					type: "checkbox",
+					hint: "Level 2 needs at least one active tool. Level 3 needs three or more tools in active use, but tool count alone does not prove novelty.",
+					opts: [
+						{ v: "elitea", l: "EPAM EliteA" },
+						{ v: "codemie", l: "EPAM CodeMie" },
+						{ v: "dial", l: "EPAM DIAL" },
+						{ v: "github_copilot", l: "GitHub Copilot" },
+						{ v: "amazonq", l: "Amazon Q Developer" },
+						{ v: "gemini", l: "Gemini Code Assist" },
+						{ v: "ms_copilot", l: "MS Copilot" },
+						{ v: "cursor", l: "Cursor" },
+						{ v: "sourcegraph", l: "Sourcegraph / Amp" },
+						{ v: "windsurf", l: "Windsurf" },
+						{ v: "kiro", l: "Kiro" },
+						{ v: "claude", l: "Claude.ai / Claude Code" },
+						{ v: "custom_client", l: "Custom Client tools" },
+						{ v: "other_tools", l: "Other" },
+					],
+				},
+			];
 
-let answers = loadAnswers();
+			// ═════════════════════════════════════════════════════════════════
+			// SCORING (mirrors the questionnaire logic)
+			// ═════════════════════════════════════════════════════════════════
+			function scoreDAU(v) {
+				if (!v) return null;
+				if (v === "80plus" || v === "70-80") return "l3";
+				if (v === "50-69") return "l2";
+				if (v === "30-49") return "partial";
+				return "none";
+			}
+			function scoreMetrics(v) {
+				if (!v) return null;
+				if (v === "all_three") return "l3";
+				if (v === "partial") return "l2";
+				return "none";
+			}
+			function scoreCost(v) {
+				if (!v) return null;
+				if (v === "visibility_reviews") return "l3";
+				if (v === "visibility_only") return "l2";
+				return "partial";
+			}
+			function scoreChampions(v) {
+				if (!v) return null;
+				if (v === "all_roles") return "l3";
+				if (v === "one") return "l2";
+				return "none";
+			}
+			function scoreArtifacts(v) {
+				if (!v) return null;
+				if (v === "codified") return "l3";
+				if (v === "onboarding") return "l2";
+				return "none";
+			}
+			function scoreDeliverables(v) {
+				if (!v) return null;
+				if (v === "75plus") return "l3";
+				if (v === "50-74") return "l2";
+				if (v === "25-49") return "partial";
+				return "none";
+			}
+			function scoreNovel(v) {
+				if (!v) return null;
+				if (v === "novel") return "l3";
+				return "l2";
+			}
+			function scoreTools(vals) {
+				if (!vals || !vals.length) return null;
+				if (vals.length >= 3) return "l3";
+				return "l2";
+			}
 
-// ═════════════════════════════════════════════════════════════════
-// QUESTION DEFINITIONS (Q1–Q12 in natural order, Q7 after Q6)
-// ═════════════════════════════════════════════════════════════════
-const QUESTIONS = [
-  {
-    id: 'q1', num: 1, badge: 'ctx',
-    title: 'Does your project have formal approval for Generative AI usage in the MSA and SoW?',
-    type: 'radio',
-    opts: [
-      { v: 'prohibited',       l: 'No — client explicitly prohibits GenAI' },
-      { v: 'no_approval',      l: 'No — approval not obtained yet' },
-      { v: 'written_approval', l: 'No, but we have written client approval' },
-      { v: 'restricted',       l: 'Yes — approved with restrictions' },
-      { v: 'widely',           l: 'Yes — approved widely' },
-      { v: 'unknown',          l: "I don't know — need to find out" },
-    ]
-  },
-  {
-    id: 'q2', num: 2, badge: 'ctx',
-    title: 'Are you using AI for SDLC on your project?',
-    type: 'radio',
-    opts: [
-      { v: 'using',      l: 'Using AI for SDLC' },
-      { v: 'discussion', l: 'Under discussion with client' },
-      { v: 'not_using',  l: 'Not using AI' },
-    ]
-  },
-  {
-    id: 'q3', num: 3, badge: 'score',
-    title: 'Daily active usage — at least one AI interaction per day (DAU)',
-    type: 'radio',
-    opts: [
-      { v: '80plus',       l: 'More than 80%' },
-      { v: '70-80',        l: '70%–80%' },
-      { v: '50-69',        l: '50%–69%' },
-      { v: '30-49',        l: '30%–49%' },
-      { v: 'sub30',        l: 'Less than 30%' },
-      { v: 'not_measured', l: 'Not measured' },
-    ]
-  },
-  {
-    id: 'q4', num: 4, badge: 'score',
-    title: 'Productivity metrics tracking (throughput, cycle time, quality)',
-    type: 'radio',
-    opts: [
-      { v: 'all_three', l: 'Track cycle time AND throughput AND quality' },
-      { v: 'partial',   l: 'Track one or two of the above' },
-      { v: 'none',      l: 'Not tracking any' },
-    ]
-  },
-  {
-    id: 'q5', num: 5, badge: 'ctx',
-    title: 'How do you track productivity metrics?',
-    type: 'radio',
-    opts: [
-      { v: 'automated', l: 'Automated (Jira, Azure DevOps, GitHub)' },
-      { v: 'surveys',   l: 'Surveys' },
-      { v: 'mixed',     l: 'Mixed — automated + surveys' },
-      { v: 'other',     l: 'Other' },
-    ]
-  },
-  {
-    id: 'q6', num: 6, badge: 'score',
-    title: 'AI Champions presence on your project',
-    type: 'radio',
-    opts: [
-      { v: 'all_roles', l: 'Champions for all core roles' },
-      { v: 'one',       l: 'One AI Champion' },
-      { v: 'none',      l: 'No AI Champions' },
-    ]
-  },
-  {
-    id: 'q7', num: 7, badge: 'ctx',
-    title: 'For each AI Champion — role(s) covered and AI activities performed',
-    type: 'textarea',
-    placeholder: 'e.g. Jane Smith — covers backend devs. Activities: maintains prompt library, runs bi-weekly workshops, reviews AI-generated code…',
-  },
-  {
-    id: 'q8', num: 8, badge: 'score',
-    title: 'Reusability of AI artifacts on your project',
-    type: 'radio',
-    opts: [
-      { v: 'codified',   l: 'Rules and agents are codified as code (versioned, reviewed, in repositories)' },
-      { v: 'onboarding', l: 'Shared prompts, rules, and agents are in onboarding materials' },
-      { v: 'none',       l: 'None of the above' },
-    ]
-  },
-  {
-    id: 'q9', num: 9, badge: 'core',
-    title: 'What % of deliverables/tasks are created or meaningfully assisted by AI?',
-    type: 'radio',
-    opts: [
-      { v: '75plus',    l: '75% or more' },
-      { v: '50-74',     l: '50% to 74%' },
-      { v: '25-49',     l: '25% to 49%' },
-      { v: 'sub25',     l: 'Less than 25%' },
-      { v: 'setting_up',l: 'Setting up — not yet measurable' },
-    ]
-  },
-  {
-    id: 'q10', num: 10, badge: 'score',
-    title: 'How do you track and manage AI usage costs?',
-    type: 'radio',
-    opts: [
-      { v: 'visibility_reviews', l: 'Visibility into costs + regular optimization reviews' },
-      { v: 'visibility_only',    l: 'Visibility into costs, no regular reviews' },
-      { v: 'no_visibility',      l: 'No visibility — client-owned or restricted' },
-    ]
-  },
-  {
-    id: 'q11', num: 11, badge: 'core3',
-    title: 'What types of AI tools/approaches do you use to create deliverables?',
-    type: 'radio',
-    hint: 'Novel: multi-agent, spec-driven, on-prem, automated pipelines. Commodity: chatbots, code completions, simple agents.',
-    opts: [
-      { v: 'novel',     l: 'Mostly Novel AI Tools' },
-      { v: 'commodity', l: 'Mostly Commodity AI Tools' },
-    ]
-  },
-  {
-    id: 'q12', num: 12, badge: 'score',
-    title: 'Which AI-powered tools does your team use? (select all that apply)',
-    type: 'checkbox',
-    opts: [
-      { v: 'elitea',        l: 'EPAM EliteA' },
-      { v: 'codemie',       l: 'EPAM CodeMie' },
-      { v: 'dial',          l: 'EPAM DIAL' },
-      { v: 'github_copilot',l: 'GitHub Copilot' },
-      { v: 'amazonq',       l: 'Amazon Q Developer' },
-      { v: 'gemini',        l: 'Gemini Code Assist' },
-      { v: 'ms_copilot',    l: 'MS Copilot' },
-      { v: 'cursor',        l: 'Cursor' },
-      { v: 'sourcegraph',   l: 'Sourcegraph / Amp' },
-      { v: 'windsurf',      l: 'Windsurf' },
-      { v: 'kiro',          l: 'Kiro' },
-      { v: 'claude',        l: 'Claude.ai / Claude Code' },
-      { v: 'custom_client', l: "Custom Client tools" },
-      { v: 'other_tools',   l: 'Other' },
-    ]
-  },
-];
+			function calcScores(a) {
+				return {
+					dau: scoreDAU(a.q3),
+					metrics: scoreMetrics(a.q4),
+					cost: scoreCost(a.q10),
+					champ: scoreChampions(a.q6),
+					art: scoreArtifacts(a.q8),
+					del: scoreDeliverables(a.q9),
+					novel: scoreNovel(a.q11),
+					tools: scoreTools(a.q12),
+				};
+			}
 
-// ═════════════════════════════════════════════════════════════════
-// SCORING (mirrors the questionnaire logic)
-// ═════════════════════════════════════════════════════════════════
-function scoreDAU(v)         { if(!v) return null; if(v==='80plus'||v==='70-80') return 'l3'; if(v==='50-69') return 'l2'; if(v==='30-49') return 'partial'; return 'none'; }
-function scoreMetrics(v)     { if(!v) return null; if(v==='all_three') return 'l3'; if(v==='partial') return 'l2'; return 'none'; }
-function scoreCost(v)        { if(!v) return null; if(v==='visibility_reviews') return 'l3'; if(v==='visibility_only') return 'l2'; return 'partial'; }
-function scoreChampions(v)   { if(!v) return null; if(v==='all_roles') return 'l3'; if(v==='one') return 'l2'; return 'none'; }
-function scoreArtifacts(v)   { if(!v) return null; if(v==='codified') return 'l3'; if(v==='onboarding') return 'l2'; return 'none'; }
-function scoreDeliverables(v){ if(!v) return null; if(v==='75plus') return 'l3'; if(v==='50-74') return 'l2'; if(v==='25-49'||v==='setting_up') return 'partial'; return 'none'; }
-function scoreNovel(v)       { if(!v) return null; if(v==='novel') return 'l3'; return 'l2'; }
-function scoreTools(vals)    { if(!vals||!vals.length) return null; if(vals.length>=3) return 'l3'; return 'l2'; }
+			function meetsLevel2(v) {
+				return v === "l2" || v === "l3";
+			}
+			function meetsLevel3(v) {
+				return v === "l3";
+			}
 
-function calcLevel(a) {
-  const s = {
-    dau:   scoreDAU(a.q3),   metrics: scoreMetrics(a.q4),
-    cost:  scoreCost(a.q10), champ:   scoreChampions(a.q6),
-    art:   scoreArtifacts(a.q8), del: scoreDeliverables(a.q9),
-    novel: scoreNovel(a.q11), tools:  scoreTools(a.q12),
-  };
-  const m2 = x => x==='l2'||x==='l3';
-  const m3 = x => x==='l3';
-  const l2 = m2(s.del)&&m2(s.dau)&&m2(s.metrics)&&m2(s.cost)&&m2(s.champ)&&m2(s.art)&&m2(s.tools);
-  const l3 = l2&&m3(s.dau)&&m3(s.metrics)&&m3(s.cost)&&m3(s.champ)&&m3(s.art)&&m3(s.del)&&m3(s.novel)&&m3(s.tools);
-  return l3?3:l2?2:1;
-}
+			const CRITERION_META = {
+				del: {
+					label: "AI-assisted deliverables",
+					l2: "Reach 50%+ AI-assisted deliverables",
+					l3: "Reach 75%+ AI-assisted deliverables",
+				},
+				dau: {
+					label: "Daily active usage",
+					l2: "Reach 50%+ DAU",
+					l3: "Reach 70%+ DAU",
+				},
+				metrics: {
+					label: "Productivity metrics",
+					l2: "Track at least one metric type",
+					l3: "Track throughput, cycle time, and quality",
+				},
+				cost: {
+					label: "AI cost visibility",
+					l2: "Get cost, token, or inference visibility",
+					l3: "Add regular cost optimization reviews",
+				},
+				champ: {
+					label: "AI champions",
+					l2: "Have at least one active champion",
+					l3: "Cover all PM-defined core roles",
+				},
+				art: {
+					label: "Reusable AI artifacts",
+					l2: "Share reusable artifacts in onboarding",
+					l3: "Codify artifacts as code",
+				},
+				tools: {
+					label: "Active AI tools",
+					l2: "Use at least one AI tool",
+					l3: "Use three or more AI tools",
+				},
+				novel: {
+					label: "Novel AI approaches",
+					l2: "Commodity or novel tools are acceptable",
+					l3: "Use mostly novel AI in production workflows",
+				},
+			};
 
-// ═════════════════════════════════════════════════════════════════
-// ROADMAP STEP DEFINITIONS
-// ═════════════════════════════════════════════════════════════════
-// Each step: qKey, q label, title, isDone(a), isPartial(a), answerLabel(a), isCore
-const ROADMAP = [
-  {
-    phase: '🏗️', phaseLabel: 'Foundation',
-    steps: [
-      {
-        qKey:'q1', q:'Q1', title:'Confirm GenAI approval',
-        isDone:    a => ['restricted','written_approval','widely'].includes(a.q1),
-        isPartial: a => a.q1==='unknown',
-        ansLabel:  a => ({prohibited:'Prohibited ✗',no_approval:'No approval yet',written_approval:'Written approval ✓',restricted:'Approved with restrictions ✓',widely:'Approved widely ✓',unknown:'Unknown — follow up'})[a.q1]||null,
-      },
-    ]
-  },
-  {
-    phase: '🚀', phaseLabel: 'Start using AI',
-    steps: [
-      {
-        qKey:'q12', q:'Q12', title:'Pick tools and get team access',
-        isDone:    a => Array.isArray(a.q12)&&a.q12.length>=1,
-        isPartial: a => false,
-        ansLabel:  a => Array.isArray(a.q12)&&a.q12.length ? `${a.q12.length} tool${a.q12.length>1?'s':''} selected ✓` : null,
-      },
-      {
-        qKey:'q6', q:'Q6', title:'Nominate one AI Champion',
-        isDone:    a => ['one','all_roles'].includes(a.q6),
-        isPartial: a => false,
-        ansLabel:  a => ({none:'No champion yet',one:'Champion nominated ✓',all_roles:'All roles covered ✓'})[a.q6]||null,
-      },
-    ]
-  },
-  {
-    phase: '📊', phaseLabel: 'Measure your baseline',
-    steps: [
-      {
-        qKey:'q3', q:'Q3', title:'Establish DAU measurement',
-        isDone:    a => ['sub30','30-49','50-69','70-80','80plus'].includes(a.q3),
-        isPartial: a => a.q3==='not_measured',
-        ansLabel:  a => ({not_measured:'Not measured yet',sub30:'< 30% measured',
-          '30-49':'30–49% measured','50-69':'50–69% ✓','70-80':'70–80% ✓','80plus':'> 80% ✓'})[a.q3]||null,
-      },
-      {
-        qKey:'q4', q:'Q4', title:'Track at least one productivity metric',
-        isDone:    a => ['partial','all_three'].includes(a.q4),
-        isPartial: a => false,
-        ansLabel:  a => ({none:'Not tracking',partial:'1–2 metric types ✓',all_three:'All 3 tracked ✓'})[a.q4]||null,
-      },
-      {
-        qKey:'q9', q:'Q9', title:'Audit your AI-assisted deliverables %',
-        isDone:    a => !!a.q9,
-        isPartial: a => false,
-        ansLabel:  a => ({setting_up:'Setting up',sub25:'< 25%','25-49':'25–49%','50-74':'50–74%','75plus':'75%+'})[a.q9]||null,
-      },
-    ]
-  },
-  {
-    phase: '🔨', phaseLabel: 'Build team habits',
-    steps: [
-      {
-        qKey:'q8', q:'Q8', title:'Share AI artifacts with the team',
-        isDone:    a => ['onboarding','codified'].includes(a.q8),
-        isPartial: a => false,
-        ansLabel:  a => ({none:'Nothing shared yet',onboarding:'In onboarding materials ✓',codified:'Managed as code ✓'})[a.q8]||null,
-      },
-      {
-        qKey:'q10', q:'Q10', title:'Get visibility into AI costs',
-        isDone:    a => ['visibility_only','visibility_reviews'].includes(a.q10),
-        isPartial: a => a.q10==='no_visibility',
-        ansLabel:  a => ({no_visibility:'Client-restricted — noted',visibility_only:'Costs visible ✓',visibility_reviews:'Visibility + reviews ✓'})[a.q10]||null,
-      },
-    ]
-  },
-  { isGate: true, cls: 'l2', icon: '⭐', title: 'Level 2 Gate — AI-Enabled', sub: 'AI-Assisted Deliverables ≥ 50% + all scoring criteria at L2',
-    isMet: a => {
-      const s = { del:scoreDeliverables(a.q9),dau:scoreDAU(a.q3),metrics:scoreMetrics(a.q4),
-        cost:scoreCost(a.q10),champ:scoreChampions(a.q6),art:scoreArtifacts(a.q8),tools:scoreTools(a.q12) };
-      return ['l2','l3'].every(x=>true) && ['del','dau','metrics','cost','champ','art','tools'].every(k=>s[k]==='l2'||s[k]==='l3');
-    }
-  },
-  {
-    phase: '📈', phaseLabel: 'Reach Level 2',
-    steps: [
-      {
-        qKey:'q3', q:'Q3', title:'Grow DAU to 50%+',
-        isDone:    a => ['50-69','70-80','80plus'].includes(a.q3),
-        isPartial: a => ['sub30','30-49'].includes(a.q3),
-        ansLabel:  a => ({sub30:'< 30% — needs growth','30-49':'30–49% — getting there',
-          '50-69':'50–69% ✓','70-80':'70–80% ✓','80plus':'> 80% ✓'})[a.q3]||null,
-      },
-      {
-        qKey:'q9', q:'Q9', title:'AI-assisted deliverables ≥ 50%', isCore: true,
-        isDone:    a => ['50-74','75plus'].includes(a.q9),
-        isPartial: a => ['25-49','setting_up','sub25'].includes(a.q9),
-        ansLabel:  a => ({setting_up:'Setting up','sub25':'< 25%','25-49':'25–49% — keep going',
-          '50-74':'50–74% ✓','75plus':'75%+ ✓'})[a.q9]||null,
-      },
-    ]
-  },
-  {
-    phase: '🔗', phaseLabel: 'Scale across the team',
-    steps: [
-      {
-        qKey:'q6', q:'Q6', title:'Champions for all core roles',
-        isDone:    a => a.q6==='all_roles',
-        isPartial: a => a.q6==='one',
-        ansLabel:  a => ({none:'No champions',one:'One champion — expand to all roles',all_roles:'All roles covered ✓'})[a.q6]||null,
-      },
-      {
-        qKey:'q4', q:'Q4', title:'Track all 3 metric types',
-        isDone:    a => a.q4==='all_three',
-        isPartial: a => a.q4==='partial',
-        ansLabel:  a => ({none:'Not tracking','partial':'1–2 types — add the rest',all_three:'All 3 tracked ✓'})[a.q4]||null,
-      },
-      {
-        qKey:'q8', q:'Q8', title:'Codify AI artifacts as code',
-        isDone:    a => a.q8==='codified',
-        isPartial: a => a.q8==='onboarding',
-        ansLabel:  a => ({none:'Nothing shared',onboarding:'In onboarding — move to code',codified:'Managed as code ✓'})[a.q8]||null,
-      },
-    ]
-  },
-  { isGate: true, cls: 'l3', icon: '🏆', title: 'Level 3 Gate — AI-Native', sub: 'Novel AI tools in production + all criteria at L3',
-    isMet: a => {
-      const s = { del:scoreDeliverables(a.q9),dau:scoreDAU(a.q3),metrics:scoreMetrics(a.q4),
-        cost:scoreCost(a.q10),champ:scoreChampions(a.q6),art:scoreArtifacts(a.q8),
-        novel:scoreNovel(a.q11),tools:scoreTools(a.q12) };
-      return Object.values(s).every(v=>v==='l3');
-    }
-  },
-  {
-    phase: '🏆', phaseLabel: 'Reach Level 3',
-    steps: [
-      {
-        qKey:'q3', q:'Q3', title:'DAU ≥ 70%',
-        isDone:    a => ['70-80','80plus'].includes(a.q3),
-        isPartial: a => a.q3==='50-69',
-        ansLabel:  a => ({'50-69':'50–69% — push to 70%','70-80':'70–80% ✓','80plus':'> 80% ✓'})[a.q3]||null,
-      },
-      {
-        qKey:'q9', q:'Q9', title:'AI-assisted deliverables ≥ 75%',
-        isDone:    a => a.q9==='75plus',
-        isPartial: a => a.q9==='50-74',
-        ansLabel:  a => ({'50-74':'50–74% — push to 75%','75plus':'75%+ ✓'})[a.q9]||null,
-      },
-      {
-        qKey:'q10', q:'Q10', title:'Regular cost optimization reviews',
-        isDone:    a => a.q10==='visibility_reviews',
-        isPartial: a => a.q10==='visibility_only',
-        ansLabel:  a => ({no_visibility:'No visibility',visibility_only:'Visible — add reviews',visibility_reviews:'Visibility + reviews ✓'})[a.q10]||null,
-      },
-      {
-        qKey:'q12', q:'Q12', title:'3 or more AI tools in active use',
-        isDone:    a => Array.isArray(a.q12)&&a.q12.length>=3,
-        isPartial: a => Array.isArray(a.q12)&&a.q12.length>0&&a.q12.length<3,
-        ansLabel:  a => Array.isArray(a.q12)&&a.q12.length
-          ? `${a.q12.length} tool${a.q12.length>1?'s':''} — ${a.q12.length>=3?'✓':'need '+(3-a.q12.length)+' more'}` : null,
-      },
-      {
-        qKey:'q11', q:'Q11', title:'Novel AI tools in production', isCore: true,
-        isDone:    a => a.q11==='novel',
-        isPartial: a => a.q11==='commodity',
-        ansLabel:  a => ({commodity:'Commodity only — explore novel approaches',novel:'Novel tools in production ✓'})[a.q11]||null,
-      },
-    ]
-  },
-];
+			function calcLevel(a) {
+				const s = calcScores(a);
+				const l2 =
+					meetsLevel2(s.del) &&
+					meetsLevel2(s.dau) &&
+					meetsLevel2(s.metrics) &&
+					meetsLevel2(s.cost) &&
+					meetsLevel2(s.champ) &&
+					meetsLevel2(s.art) &&
+					meetsLevel2(s.tools);
+				const l3 =
+					l2 &&
+					meetsLevel3(s.dau) &&
+					meetsLevel3(s.metrics) &&
+					meetsLevel3(s.cost) &&
+					meetsLevel3(s.champ) &&
+					meetsLevel3(s.art) &&
+					meetsLevel3(s.del) &&
+					meetsLevel3(s.novel) &&
+					meetsLevel3(s.tools);
+				return l3 ? 3 : l2 ? 2 : 1;
+			}
 
-// ═════════════════════════════════════════════════════════════════
-// RENDER QUESTIONS
-// ═════════════════════════════════════════════════════════════════
-function setRadio(qid, val) {
-  answers[qid] = val;
-  saveAnswers(answers);
-  renderAll();
-}
-function setCheckbox(qid, val) {
-  const cur = answers[qid] || [];
-  const idx = cur.indexOf(val);
-  answers[qid] = idx === -1 ? [...cur, val] : cur.filter(v => v !== val);
-  saveAnswers(answers);
-  renderAll();
-}
-function setTextarea(qid, val) {
-  answers[qid] = val;
-  saveAnswers(answers);
-  updateHeader();
-}
+			function listBlockers(targetLevel, scores) {
+				const keys =
+					targetLevel === 2
+						? [
+								"del",
+								"dau",
+								"metrics",
+								"cost",
+								"champ",
+								"art",
+								"tools",
+							]
+						: [
+								"del",
+								"dau",
+								"metrics",
+								"cost",
+								"champ",
+								"art",
+								"tools",
+								"novel",
+							];
 
-function isAnswered(q) {
-  const v = answers[q.id];
-  if (q.type === 'radio')    return !!v;
-  if (q.type === 'checkbox') return Array.isArray(v) && v.length > 0;
-  if (q.type === 'textarea') return typeof v === 'string' && v.trim().length > 0;
-  return false;
-}
+				return keys
+					.filter((key) =>
+						targetLevel === 2
+							? !meetsLevel2(scores[key])
+							: !meetsLevel3(scores[key]),
+					)
+					.map((key) =>
+						targetLevel === 2
+							? CRITERION_META[key].l2
+							: CRITERION_META[key].l3,
+					);
+			}
 
-function renderQuestions() {
-  const badgeLabels = { core:'Core · L2', core3:'Core · L3', score:'Scoring', ctx:'Context' };
+			function getManualReviewNotes(a) {
+				const notes = [];
+				if (a.q10 === "no_visibility") {
+					notes.push(
+						"Manual review can help Level 2 consideration when cost visibility is blocked by the client. The team should document that the restriction is external and provide token, inference, or usage evidence if available.",
+					);
+				}
+				if (a.q1 === "prohibited" || a.q1 === "unknown") {
+					notes.push(
+						"GenAI approval is a context blocker. Reviewers should not overlook this even if scoring criteria improve elsewhere.",
+					);
+				}
+				if (a.q11 === "commodity") {
+					notes.push(
+						"Level 3 novelty may still need reviewer interpretation if the workflow is unusually advanced, but commodity use should not be auto-upgraded without evidence.",
+					);
+				}
+				return notes;
+			}
 
-  const html = QUESTIONS.map(q => {
-    const answered = isAnswered(q);
-    let optsHtml = '';
+			function getGateDetail(section, a) {
+				const scores = calcScores(a);
+				const blockers = listBlockers(
+					section.cls === "l2" ? 2 : 3,
+					scores,
+				);
+				const notes = getManualReviewNotes(a);
 
-    if (q.type === 'radio') {
-      optsHtml = `<div class="qc-opts">${q.opts.map(o => {
-        const sel = answers[q.id] === o.v;
-        return `<div class="qc-opt${sel?' sel':''}" onclick="setRadio('${q.id}','${o.v}')">
-          <span class="qc-opt-icon">${sel?'●':'○'}</span><span>${o.l}</span></div>`;
-      }).join('')}</div>`;
-    } else if (q.type === 'checkbox') {
-      const selVals = answers[q.id] || [];
-      optsHtml = `<div class="qc-opts grid">${q.opts.map(o => {
-        const sel = selVals.includes(o.v);
-        return `<div class="qc-opt${sel?' sel':''}" onclick="setCheckbox('${q.id}','${o.v}')">
-          <span class="qc-opt-icon">${sel?'☑':'☐'}</span><span>${o.l}</span></div>`;
-      }).join('')}</div>`;
-    } else if (q.type === 'textarea') {
-      const val = answers[q.id] || '';
-      optsHtml = `<textarea class="qc-textarea" placeholder="${q.placeholder||''}"
+				if (section.cls === "l2") {
+					if (!blockers.length && !notes.length)
+						return "All Level 2 requirements are currently satisfied.";
+					if (!blockers.length && notes.length)
+						return `All strict Level 2 criteria are met. Manual review notes: ${notes.join(" ")}`;
+					let detail = `<strong>Still needed:</strong> ${blockers.join("; ")}.`;
+					if (a.q10 === "no_visibility") {
+						detail +=
+							" Client-restricted cost visibility still stays below strict Level 2 scoring, but a documented manual review note can explain why the team may still deserve reviewer consideration.";
+					}
+					return detail;
+				}
+
+				if (!blockers.length && !notes.length)
+					return "All Level 3 requirements are currently satisfied.";
+				let detail = blockers.length
+					? `<strong>Still needed:</strong> ${blockers.join("; ")}.`
+					: "All strict Level 3 criteria are met.";
+				if (a.q11 === "commodity") {
+					detail +=
+						" Novel status should be interpreted against the current quarterly baseline and proven in real production workflows.";
+				}
+				return detail;
+			}
+
+			// ═════════════════════════════════════════════════════════════════
+			// ROADMAP STEP DEFINITIONS
+			// ═════════════════════════════════════════════════════════════════
+			// Each step: qKey, q label, title, isDone(a), isPartial(a), answerLabel(a), isCore
+			const ROADMAP = [
+				{
+					phase: "🏗️",
+					phaseLabel: "Foundation",
+					steps: [
+						{
+							qKey: "q1",
+							q: "Q1",
+							title: "Confirm GenAI approval",
+							isDone: (a) =>
+								[
+									"restricted",
+									"written_approval",
+									"widely",
+								].includes(a.q1),
+							isPartial: (a) => a.q1 === "unknown",
+							ansLabel: (a) =>
+								({
+									prohibited: "Prohibited ✗",
+									no_approval: "No approval yet",
+									written_approval: "Written approval ✓",
+									restricted: "Approved with restrictions ✓",
+									widely: "Approved widely ✓",
+									unknown: "Unknown — follow up",
+								})[a.q1] || null,
+						},
+					],
+				},
+				{
+					phase: "🚀",
+					phaseLabel: "Start using AI",
+					steps: [
+						{
+							qKey: "q12",
+							q: "Q12",
+							title: "Pick tools and get team access",
+							isDone: (a) =>
+								Array.isArray(a.q12) && a.q12.length >= 1,
+							isPartial: (a) => false,
+							ansLabel: (a) =>
+								Array.isArray(a.q12) && a.q12.length
+									? `${a.q12.length} tool${a.q12.length > 1 ? "s" : ""} selected ✓`
+									: null,
+						},
+						{
+							qKey: "q6",
+							q: "Q6",
+							title: "Nominate one AI Champion",
+							isDone: (a) => ["one", "all_roles"].includes(a.q6),
+							isPartial: (a) => false,
+							ansLabel: (a) =>
+								({
+									none: "No champion yet",
+									one: "Champion nominated ✓",
+									all_roles: "All roles covered ✓",
+								})[a.q6] || null,
+						},
+					],
+				},
+				{
+					phase: "📊",
+					phaseLabel: "Measure your baseline",
+					steps: [
+						{
+							qKey: "q3",
+							q: "Q3",
+							title: "Establish DAU measurement",
+							isDone: (a) =>
+								[
+									"sub30",
+									"30-49",
+									"50-69",
+									"70-80",
+									"80plus",
+								].includes(a.q3),
+							isPartial: (a) => a.q3 === "not_measured",
+							ansLabel: (a) =>
+								({
+									not_measured: "Not measured yet",
+									sub30: "< 30% measured",
+									"30-49": "30–49% measured",
+									"50-69": "50–69% ✓",
+									"70-80": "70–80% ✓",
+									"80plus": "> 80% ✓",
+								})[a.q3] || null,
+						},
+						{
+							qKey: "q4",
+							q: "Q4",
+							title: "Track at least one productivity metric",
+							isDone: (a) =>
+								["partial", "all_three"].includes(a.q4),
+							isPartial: (a) => false,
+							ansLabel: (a) =>
+								({
+									none: "Not tracking",
+									partial: "1–2 metric types ✓",
+									all_three: "All 3 tracked ✓",
+								})[a.q4] || null,
+						},
+						{
+							qKey: "q9",
+							q: "Q9",
+							title: "Audit your AI-assisted deliverables %",
+							isDone: (a) => !!a.q9,
+							isPartial: (a) => false,
+							ansLabel: (a) =>
+								({
+									setting_up: "Setting up",
+									sub25: "< 25%",
+									"25-49": "25–49%",
+									"50-74": "50–74%",
+									"75plus": "75%+",
+								})[a.q9] || null,
+						},
+					],
+				},
+				{
+					phase: "🔨",
+					phaseLabel: "Build team habits",
+					steps: [
+						{
+							qKey: "q8",
+							q: "Q8",
+							title: "Share AI artifacts with the team",
+							isDone: (a) =>
+								["onboarding", "codified"].includes(a.q8),
+							isPartial: (a) => false,
+							ansLabel: (a) =>
+								({
+									none: "Nothing shared yet",
+									onboarding: "In onboarding materials ✓",
+									codified: "Managed as code ✓",
+								})[a.q8] || null,
+						},
+						{
+							qKey: "q10",
+							q: "Q10",
+							title: "Get visibility into AI costs",
+							isDone: (a) =>
+								[
+									"visibility_only",
+									"visibility_reviews",
+								].includes(a.q10),
+							isPartial: (a) => a.q10 === "no_visibility",
+							ansLabel: (a) =>
+								({
+									no_visibility: "Client-restricted — noted",
+									visibility_only: "Costs visible ✓",
+									visibility_reviews:
+										"Visibility + reviews ✓",
+								})[a.q10] || null,
+						},
+					],
+				},
+				{
+					isGate: true,
+					cls: "l2",
+					icon: "⭐",
+					title: "Level 2 Gate — AI-Enabled",
+					sub: "AI-Assisted Deliverables ≥ 50% + all scoring criteria at L2",
+					isMet: (a) => {
+						const s = calcScores(a);
+						return [
+							"del",
+							"dau",
+							"metrics",
+							"cost",
+							"champ",
+							"art",
+							"tools",
+						].every((k) => meetsLevel2(s[k]));
+					},
+				},
+				{
+					phase: "📈",
+					phaseLabel: "Reach Level 2",
+					steps: [
+						{
+							qKey: "q3",
+							q: "Q3",
+							title: "Grow DAU to 50%+",
+							isDone: (a) =>
+								["50-69", "70-80", "80plus"].includes(a.q3),
+							isPartial: (a) => ["sub30", "30-49"].includes(a.q3),
+							ansLabel: (a) =>
+								({
+									sub30: "< 30% — needs growth",
+									"30-49": "30–49% — getting there",
+									"50-69": "50–69% ✓",
+									"70-80": "70–80% ✓",
+									"80plus": "> 80% ✓",
+								})[a.q3] || null,
+						},
+						{
+							qKey: "q9",
+							q: "Q9",
+							title: "AI-assisted deliverables ≥ 50%",
+							isCore: true,
+							isDone: (a) => ["50-74", "75plus"].includes(a.q9),
+							isPartial: (a) => ["25-49"].includes(a.q9),
+							ansLabel: (a) =>
+								({
+									setting_up: "Setting up",
+									sub25: "< 25%",
+									"25-49": "25–49% — keep going",
+									"50-74": "50–74% ✓",
+									"75plus": "75%+ ✓",
+								})[a.q9] || null,
+						},
+					],
+				},
+				{
+					phase: "🔗",
+					phaseLabel: "Scale across the team",
+					steps: [
+						{
+							qKey: "q6",
+							q: "Q6",
+							title: "Champions for all core roles",
+							isDone: (a) => a.q6 === "all_roles",
+							isPartial: (a) => a.q6 === "one",
+							ansLabel: (a) =>
+								({
+									none: "No champions",
+									one: "One champion — expand to all roles",
+									all_roles: "All roles covered ✓",
+								})[a.q6] || null,
+						},
+						{
+							qKey: "q4",
+							q: "Q4",
+							title: "Track all 3 metric types",
+							isDone: (a) => a.q4 === "all_three",
+							isPartial: (a) => a.q4 === "partial",
+							ansLabel: (a) =>
+								({
+									none: "Not tracking",
+									partial: "1–2 types — add the rest",
+									all_three: "All 3 tracked ✓",
+								})[a.q4] || null,
+						},
+						{
+							qKey: "q8",
+							q: "Q8",
+							title: "Codify AI artifacts as code",
+							isDone: (a) => a.q8 === "codified",
+							isPartial: (a) => a.q8 === "onboarding",
+							ansLabel: (a) =>
+								({
+									none: "Nothing shared",
+									onboarding: "In onboarding — move to code",
+									codified: "Managed as code ✓",
+								})[a.q8] || null,
+						},
+					],
+				},
+				{
+					isGate: true,
+					cls: "l3",
+					icon: "🏆",
+					title: "Level 3 Gate — AI-Native",
+					sub: "Novel AI tools in production + all criteria at L3",
+					isMet: (a) => {
+						const s = calcScores(a);
+						return Object.values(s).every((v) => v === "l3");
+					},
+				},
+				{
+					phase: "🏆",
+					phaseLabel: "Reach Level 3",
+					steps: [
+						{
+							qKey: "q3",
+							q: "Q3",
+							title: "DAU ≥ 70%",
+							isDone: (a) => ["70-80", "80plus"].includes(a.q3),
+							isPartial: (a) => a.q3 === "50-69",
+							ansLabel: (a) =>
+								({
+									"50-69": "50–69% — push to 70%",
+									"70-80": "70–80% ✓",
+									"80plus": "> 80% ✓",
+								})[a.q3] || null,
+						},
+						{
+							qKey: "q9",
+							q: "Q9",
+							title: "AI-assisted deliverables ≥ 75%",
+							isDone: (a) => a.q9 === "75plus",
+							isPartial: (a) => a.q9 === "50-74",
+							ansLabel: (a) =>
+								({
+									"50-74": "50–74% — push to 75%",
+									"75plus": "75%+ ✓",
+								})[a.q9] || null,
+						},
+						{
+							qKey: "q10",
+							q: "Q10",
+							title: "Regular cost optimization reviews",
+							isDone: (a) => a.q10 === "visibility_reviews",
+							isPartial: (a) => a.q10 === "visibility_only",
+							ansLabel: (a) =>
+								({
+									no_visibility: "No visibility",
+									visibility_only: "Visible — add reviews",
+									visibility_reviews:
+										"Visibility + reviews ✓",
+								})[a.q10] || null,
+						},
+						{
+							qKey: "q12",
+							q: "Q12",
+							title: "3 or more AI tools in active use",
+							isDone: (a) =>
+								Array.isArray(a.q12) && a.q12.length >= 3,
+							isPartial: (a) =>
+								Array.isArray(a.q12) &&
+								a.q12.length > 0 &&
+								a.q12.length < 3,
+							ansLabel: (a) =>
+								Array.isArray(a.q12) && a.q12.length
+									? `${a.q12.length} tool${a.q12.length > 1 ? "s" : ""} — ${a.q12.length >= 3 ? "✓" : "need " + (3 - a.q12.length) + " more"}`
+									: null,
+						},
+						{
+							qKey: "q11",
+							q: "Q11",
+							title: "Novel AI tools in production",
+							isCore: true,
+							isDone: (a) => a.q11 === "novel",
+							isPartial: (a) => a.q11 === "commodity",
+							ansLabel: (a) =>
+								({
+									commodity:
+										"Commodity only — explore novel approaches",
+									novel: "Novel tools in production ✓",
+								})[a.q11] || null,
+						},
+					],
+				},
+			];
+
+			// ═════════════════════════════════════════════════════════════════
+			// RENDER QUESTIONS
+			// ═════════════════════════════════════════════════════════════════
+			function setRadio(qid, val) {
+				answers[qid] = val;
+				saveAnswers(answers);
+				renderAll();
+			}
+			function setCheckbox(qid, val) {
+				const cur = answers[qid] || [];
+				const idx = cur.indexOf(val);
+				answers[qid] =
+					idx === -1 ? [...cur, val] : cur.filter((v) => v !== val);
+				saveAnswers(answers);
+				renderAll();
+			}
+			function setTextarea(qid, val) {
+				answers[qid] = val;
+				saveAnswers(answers);
+				updateHeader();
+			}
+
+			function isAnswered(q) {
+				const v = answers[q.id];
+				if (q.type === "radio") return !!v;
+				if (q.type === "checkbox")
+					return Array.isArray(v) && v.length > 0;
+				if (q.type === "textarea")
+					return typeof v === "string" && v.trim().length > 0;
+				return false;
+			}
+
+			function renderQuestions() {
+				const badgeLabels = {
+					core: "Core · L2",
+					core3: "Core · L3",
+					score: "Scoring",
+					ctx: "Context",
+				};
+
+				const html = QUESTIONS.map((q) => {
+					const answered = isAnswered(q);
+					let optsHtml = "";
+
+					if (q.type === "radio") {
+						optsHtml = `<div class="qc-opts">${q.opts
+							.map((o) => {
+								const sel = answers[q.id] === o.v;
+								return `<div class="qc-opt${sel ? " sel" : ""}" onclick="setRadio('${q.id}','${o.v}')">
+          <span class="qc-opt-icon">${sel ? "●" : "○"}</span><span>${o.l}</span></div>`;
+							})
+							.join("")}</div>`;
+					} else if (q.type === "checkbox") {
+						const selVals = answers[q.id] || [];
+						optsHtml = `<div class="qc-opts grid">${q.opts
+							.map((o) => {
+								const sel = selVals.includes(o.v);
+								return `<div class="qc-opt${sel ? " sel" : ""}" onclick="setCheckbox('${q.id}','${o.v}')">
+          <span class="qc-opt-icon">${sel ? "☑" : "☐"}</span><span>${o.l}</span></div>`;
+							})
+							.join("")}</div>`;
+					} else if (q.type === "textarea") {
+						const val = answers[q.id] || "";
+						optsHtml = `<textarea class="qc-textarea" placeholder="${q.placeholder || ""}"
         oninput="setTextarea('${q.id}',this.value)">${val}</textarea>`;
-    }
+					}
 
-    return `<div class="qc${answered?' answered':''}" id="qcard-${q.id}">
+					return `<div class="qc${answered ? " answered" : ""}" id="qcard-${q.id}">
       <div class="qc-hdr">
-        <div class="qc-num${answered?' done':''}">${q.num}</div>
+        <div class="qc-num${answered ? " done" : ""}">${q.num}</div>
         <div class="qc-title">${q.title}</div>
         <span class="qc-badge badge-${q.badge}">${badgeLabels[q.badge]}</span>
       </div>
-      ${q.hint ? `<div class="qc-hint">${q.hint}</div>` : ''}
+      ${q.hint ? `<div class="qc-hint">${q.hint}</div>` : ""}
       ${optsHtml}
     </div>`;
-  }).join('');
+				}).join("");
 
-  document.getElementById('questions-root').innerHTML = html;
-}
+				document.getElementById("questions-root").innerHTML = html;
+			}
 
-// ═════════════════════════════════════════════════════════════════
-// RENDER ROADMAP
-// ═════════════════════════════════════════════════════════════════
-function stepStatus(step) {
-  if (step.isDone(answers))    return 'done';
-  if (step.isPartial(answers)) return 'active';
-  return 'pending';
-}
+			// ═════════════════════════════════════════════════════════════════
+			// RENDER ROADMAP
+			// ═════════════════════════════════════════════════════════════════
+			function stepStatus(step) {
+				if (step.isDone(answers)) return "done";
+				if (step.isPartial(answers)) return "active";
+				return "pending";
+			}
 
-function renderRoadmap() {
-  const a = answers;
-  const level = calcLevel(a);
+			function renderRoadmap() {
+				const a = answers;
+				const level = calcLevel(a);
+				const scores = calcScores(a);
+				const l2Blockers = listBlockers(2, scores);
+				const l3Blockers = listBlockers(3, scores);
+				const manualReviewNotes = getManualReviewNotes(a);
 
-  // Collect all steps to check if anything is answered yet
-  const allSteps = ROADMAP.flatMap(r => r.isGate ? [] : r.steps);
-  const anyAnswered = Object.keys(a).length > 0;
+				const anyAnswered = Object.keys(a).length > 0;
 
-  // Update note visibility
-  document.getElementById('rm-note').style.display = anyAnswered ? 'none' : 'block';
+				// Update note visibility
+				document.getElementById("rm-note").style.display = anyAnswered
+					? "none"
+					: "block";
 
-  // Level banner
-  const levelNames = ['','Exploring','AI-Enabled','AI-Native'];
-  const levelCls   = ['','l1','l2','l3'];
-  const levelSub   = ['',
-    'Begin answering questions to map your path',
-    'AI is embedded — keep scaling',
-    'AI-Native — leading the way'
-  ];
-  document.getElementById('rm-level-banner').innerHTML = `
+				// Level banner
+				const levelNames = ["", "Exploring", "AI-Enabled", "AI-Native"];
+				const levelCls = ["", "l1", "l2", "l3"];
+				const levelSub = [
+					"",
+					"Begin answering questions to map your path",
+					"AI is embedded — keep scaling",
+					"AI-Native — leading the way",
+				];
+				document.getElementById("rm-level-banner").innerHTML = `
     <div class="rm-level-banner ${levelCls[level]}">
       <div class="rm-level-num">${level}</div>
       <div>
@@ -690,90 +1646,132 @@ function renderRoadmap() {
       </div>
     </div>`;
 
-  // Steps
-  let html = '';
-  for (const section of ROADMAP) {
-    if (section.isGate) {
-      const met = section.isMet(a);
-      html += `<div class="rm-gate ${section.cls}${met?' met':''}">
+				document.getElementById("rm-summary").innerHTML = `
+    <div class="rm-summary-grid">
+      <div class="rm-summary-card">
+        <div class="rm-summary-kicker">Strict Result</div>
+        <div class="rm-summary-title">Level ${level} — ${levelNames[level]}</div>
+        <div class="rm-summary-body">The strict level follows the survey scoring model only. Manual review notes below do not auto-change the level.</div>
+      </div>
+      <div class="rm-summary-card">
+        <div class="rm-summary-kicker">Blockers To Level 2</div>
+        ${
+			l2Blockers.length
+				? `<ul class="rm-summary-list">${l2Blockers.map((item) => `<li>${item}</li>`).join("")}</ul>`
+				: `<div class="rm-summary-body">No strict Level 2 blockers remain.</div>`
+		}
+      </div>
+      <div class="rm-summary-card">
+        <div class="rm-summary-kicker">Blockers To Level 3</div>
+        ${
+			l3Blockers.length
+				? `<ul class="rm-summary-list">${l3Blockers.map((item) => `<li>${item}</li>`).join("")}</ul>`
+				: `<div class="rm-summary-body">No strict Level 3 blockers remain.</div>`
+		}
+      </div>
+      <div class="rm-summary-card">
+        <div class="rm-summary-kicker">Manual Review Notes</div>
+        ${
+			manualReviewNotes.length
+				? `<ul class="rm-summary-list">${manualReviewNotes.map((item) => `<li>${item}</li>`).join("")}</ul>`
+				: `<div class="rm-summary-body rm-summary-empty">No manual review caveats are currently flagged.</div>`
+		}
+      </div>
+    </div>`;
+
+				// Steps
+				let html = "";
+				for (const section of ROADMAP) {
+					if (section.isGate) {
+						const met = section.isMet(a);
+						const detail = getGateDetail(section, a);
+						html += `<div class="rm-gate ${section.cls}${met ? " met" : ""}">
         <div class="rm-gate-icon">${section.icon}</div>
         <div class="rm-gate-body">
           <div class="rm-gate-title">${section.title}</div>
           <div class="rm-gate-sub">${section.sub}</div>
+          <div class="rm-gate-detail">${detail}</div>
         </div>
-        <div class="rm-gate-pill ${met?'met':'unmet'}">${met?'Met ✓':'Not yet'}</div>
+        <div class="rm-gate-pill ${met ? "met" : "unmet"}">${met ? "Met ✓" : "Not yet"}</div>
       </div>`;
-      continue;
-    }
+						continue;
+					}
 
-    html += `<div class="rm-phase">
+					html += `<div class="rm-phase">
       <span class="rm-phase-icon">${section.phase}</span>
       <span class="rm-phase-lbl">${section.phaseLabel}</span>
       <div class="rm-phase-line"></div>
     </div>`;
 
-    section.steps.forEach((step, i) => {
-      const status = stepStatus(step);
-      const lbl = step.ansLabel(a);
-      const isLast = i === section.steps.length - 1;
-      const icon = status === 'done' ? '✓' : status === 'active' ? '→' : '';
-      const pendingLbl = status === 'pending' && !anyAnswered ? 'Answer the question →' : null;
+					section.steps.forEach((step, i) => {
+						const status = stepStatus(step);
+						const lbl = step.ansLabel(a);
+						const isLast = i === section.steps.length - 1;
+						const icon =
+							status === "done"
+								? "✓"
+								: status === "active"
+									? "→"
+									: "";
+						const pendingLbl =
+							status === "pending" && !anyAnswered
+								? "Answer the question →"
+								: null;
 
-      html += `<div class="rm-step" onclick="scrollToQuestion('${step.qKey}')">
+						html += `<div class="rm-step" onclick="scrollToQuestion('${step.qKey}')">
         <div class="rm-step-left">
           <div class="rm-step-circle ${status}">${icon}</div>
-          ${!isLast ? `<div class="rm-step-line ${status==='done'?'done':''}"></div>` : ''}
+          ${!isLast ? `<div class="rm-step-line ${status === "done" ? "done" : ""}"></div>` : ""}
         </div>
         <div class="rm-step-body">
           <div class="rm-step-hdr">
             <span class="rm-step-qtag">${step.q}</span>
             <span class="rm-step-title ${status}">${step.title}</span>
-            ${step.isCore ? '<span class="rm-step-core">★ Core</span>' : ''}
+            ${step.isCore ? '<span class="rm-step-core">★ Core</span>' : ""}
           </div>
-          ${lbl
-            ? `<div class="rm-step-answer ${status}">${lbl}</div>`
-            : pendingLbl
-              ? `<div class="rm-step-answer pending">${pendingLbl}</div>`
-              : ''}
+          ${
+				lbl
+					? `<div class="rm-step-answer ${status}">${lbl}</div>`
+					: pendingLbl
+						? `<div class="rm-step-answer pending">${pendingLbl}</div>`
+						: ""
+			}
         </div>
       </div>`;
-    });
-  }
+					});
+				}
 
-  document.getElementById('rm-steps').innerHTML = html;
-}
+				document.getElementById("rm-steps").innerHTML = html;
+			}
 
-// ═════════════════════════════════════════════════════════════════
-// HEADER + INTERACTION
-// ═════════════════════════════════════════════════════════════════
-function updateHeader() {
-  const answered = QUESTIONS.filter(q => isAnswered(q)).length;
-  const pct = Math.round(answered / QUESTIONS.length * 100);
-  document.getElementById('hdr-fill').style.width = pct + '%';
-  document.getElementById('hdr-pct').textContent = `${answered} / ${QUESTIONS.length}`;
-  const lvl = calcLevel(answers);
-  const lvlNames = ['','Level 1','Level 2','Level 3'];
-  document.getElementById('hdr-level').textContent = lvlNames[lvl];
-}
+			// ═════════════════════════════════════════════════════════════════
+			// HEADER + INTERACTION
+			// ═════════════════════════════════════════════════════════════════
+			function updateHeader() {
+				const lvl = calcLevel(answers);
+				const lvlNames = ["", "Level 1", "Level 2", "Level 3"];
+				document.getElementById("hdr-level").textContent =
+					lvlNames[lvl];
+			}
 
-function scrollToQuestion(qKey) {
-  const el = document.getElementById('qcard-' + qKey);
-  if (!el) return;
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  el.classList.add('highlight');
-  setTimeout(() => el.classList.remove('highlight'), 1400);
-}
+			function scrollToQuestion(qKey) {
+				const el = document.getElementById("qcard-" + qKey);
+				if (!el) return;
+				el.scrollIntoView({ behavior: "smooth", block: "center" });
+				el.classList.add("highlight");
+				setTimeout(() => el.classList.remove("highlight"), 1400);
+			}
 
-function renderAll() {
-  renderQuestions();
-  renderRoadmap();
-  updateHeader();
-}
+			function renderAll() {
+				renderQuestions();
+				renderRoadmap();
+				updateHeader();
+			}
 
-// ═════════════════════════════════════════════════════════════════
-// INIT
-// ═════════════════════════════════════════════════════════════════
-renderAll();
-</script>
-</body>
+			// ═════════════════════════════════════════════════════════════════
+			// INIT
+			// ═════════════════════════════════════════════════════════════════
+			renderAll();
+		</script>
+	</body>
 </html>
